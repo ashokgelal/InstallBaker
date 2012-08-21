@@ -172,6 +172,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DietMvvm\DietMvvm\DietMvvm\DietMvvm.csproj">
+      <Project>{25b95c3e-4ef7-41c9-b649-0645754152de}</Project>
+      <Name>DietMvvm</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
