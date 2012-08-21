@@ -9,9 +9,27 @@
              d:DesignHeight="300" d:DesignWidth="300"
              Name="MyToolWindow">
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Margin="10" HorizontalAlignment="Center">InstallBaker Tool Window</TextBlock>
-            <Button Content="_Click Me!" Click="button1_Click" Width="120" Height="80" Name="button1"/>
-        </StackPanel>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"  />
+            <RowDefinition Height="*"  />
+        </Grid.RowDefinitions>
+        <ToolBar >
+            <Button Content="Foo" />
+        </ToolBar>
+<!--        <StackPanel Grid.Row="1" Orientation="Vertical">-->
+            <TabControl Grid.Row="1" VerticalAlignment="Stretch">
+                <TabItem Header="Updates">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+                <TabItem Header="Includes">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+                <TabItem Header="Excludes">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+            </TabControl>
+<!--            <Button Content="_Click Me!" Click="button1_Click" Width="120" Height="80" Name="button1" />-->
+<!--        </StackPanel>-->
     </Grid>
 </UserControl>

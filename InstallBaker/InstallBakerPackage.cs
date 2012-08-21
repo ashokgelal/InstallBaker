@@ -7,11 +7,8 @@ using System.Runtime.InteropServices;
 using AshokGelal.InstallBaker.Integration;
 using AshokGelal.InstallBaker.UI;
 
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
 
 namespace AshokGelal.InstallBaker
 {
@@ -49,7 +46,7 @@ namespace AshokGelal.InstallBaker
         /// </summary>
         public InstallBakerPackage()
         {
-            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+            Debug.WriteLine( "Entering constructor for: {0}", ToString());
         }
 
         #endregion Constructors
@@ -62,20 +59,20 @@ namespace AshokGelal.InstallBaker
         /// </summary>
         protected override void Initialize()
         {
-            Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            Debug.WriteLine ( "Entering Initialize() of: {0}", ToString());
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
                 // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBaker);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
+                var menuCommandID = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBaker);
+                var menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
                 mcs.AddCommand( menuItem );
                 // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBakerToolWindow);
-                MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
+                var toolwndCommandID = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBakerToolWindow);
+                var menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand( menuToolWin );
             }
         }
@@ -94,14 +91,14 @@ namespace AshokGelal.InstallBaker
         private void MenuItemCallback(object sender, EventArgs e)
         {
             // Show a Message Box to prove we were here
-            IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
+            var uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
             Guid clsid = Guid.Empty;
             int result;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(uiShell.ShowMessageBox(
                        0,
                        ref clsid,
                        "InstallBaker",
-                       string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.ToString()),
+                       string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", ToString()),
                        string.Empty,
                        0,
                        OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -121,12 +118,12 @@ namespace AshokGelal.InstallBaker
             // Get the instance number 0 of this tool window. This window is single instance so this instance
             // is actually the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
-            ToolWindowPane window = this.FindToolWindow(typeof(MyToolWindow), 0, true);
+            var window = FindToolWindow(typeof(MyToolWindow), 0, true);
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException(Properties.Resources.CanNotCreateWindow);
             }
-            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            var windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 

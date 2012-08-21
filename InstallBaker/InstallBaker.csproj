@@ -121,6 +121,11 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\BaseEventsService.cs" />
+    <Compile Include="Events\BuildProgressService.cs" />
+    <Compile Include="Events\BuildConfig.cs" />
+    <Compile Include="Events\InstallBakerEventAggregator.cs" />
+    <Compile Include="Events\ProjectInfo.cs" />
     <Compile Include="UI\MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
     </Compile>
@@ -178,7 +183,6 @@
       <Name>DietMvvm</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
