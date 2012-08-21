@@ -1,0 +1,289 @@
+﻿<?xml version="1.0"?>
+<CodeConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Handlers>
+    <ProjectHandler Parser="NArrange.Core.MSBuildProjectParser">
+      <!-- List of handled project extensions -->
+      <ProjectExtensions>
+        <Extension Name="csproj"/>
+        <Extension Name="vbproj"/>
+      </ProjectExtensions>
+    </ProjectHandler>
+    <ProjectHandler Parser="NArrange.Core.MonoDevelopProjectParser">
+      <ProjectExtensions>
+        <Extension Name="mdp"/>
+      </ProjectExtensions>
+    </ProjectHandler>
+    <!-- Source handlers are plugins that help NArrange parse and write source files -->
+    <SourceHandler Language="CSharp" Assembly="NArrange.CSharp, Version=0.2.9.0, Culture=neutral, PublicKeyToken=null">
+      <!-- List of handled source file extensions -->
+      <SourceExtensions>
+        <Extension Name="cs">
+          <Filter Condition="!($(File.Name) : '.Designer.')"/>
+        </Extension>
+        <!-- If your project uses other extensions for C# files add them here-->
+      </SourceExtensions>
+    </SourceHandler>
+    <SourceHandler Language="VisualBasic" Assembly="NArrange.VisualBasic, Version=0.2.9.0, Culture=neutral, PublicKeyToken=null">
+      <SourceExtensions>
+        <Extension Name="vb">
+          <Filter Condition="!($(File.Name) : '.Designer.')"/>
+        </Extension>
+      </SourceExtensions>
+    </SourceHandler>
+  </Handlers>
+  <!--For encoding, Codepage can be any of the following:
+        "Detect"  - Detect file encodings (NArrange default)
+        "Default" - Use the system default ANSI encoding (e.g. CodePage 1252 Western-European)
+        CodePage  - e.g. "65001" for UTF-8
+     -->
+    <Encoding CodePage="Detect"/>
+    <Formatting>
+      <Tabs Style="Spaces" SpacesPerTab="4"/>
+      <ClosingComments Enabled="false" Format="End $(ElementType) $(Name)"/>
+      <Regions EndRegionNameEnabled="true" Style="Default"
+        CommentDirectiveBeginPattern="^\s?\$\(\s?Begin\s?\)\s?(?&lt;Name&gt;.*)$"
+        CommentDirectiveEndPattern="^\s?\$\(\s?End\s?\)\s?(?&lt;Name&gt;.*)?$"
+        CommentDirectiveBeginFormat=" $(Begin) {0}"
+        CommentDirectiveEndFormat=" $(End) {0}"/>
+      <LineSpacing RemoveConsecutiveBlankLines="true" />
+    </Formatting>
+    <Elements>
+      <Region Name="Header">
+        <Elements>
+          <Element Type="Comment">
+            <!-- File header comments -->
+            <Filter Condition="$(Type) != 'XmlLine'"/>
+          </Element>
+        </Elements>
+      </Region>
+      <Element Id="DefaultUsing" Type="Using">
+        <Group By="Type" SeparatorType="NewLine" Direction="Ascending">
+          <!-- Note: System reference group is always placed first -->
+          <Group By="Name" AttributeCapture="^(.*?)(\.|$)" SeparatorType="NewLine" Direction="Ascending"/>
+        </Group>
+        <!-- Sort by name within groups -->
+        <Sort By="Name"/>
+      </Element>
+      <!-- End Using -->
+      <Element Type="Attribute"/>
+      <Element Id="DefaultConditional"  Type="ConditionDirective">
+        <Elements>
+          <ElementRef Id="DefaultNamespace"/>
+          <ElementRef Id="DefaultInterface"/>
+          <ElementRef Id="DefaultType"/>
+          <Element>
+            <Sort By="Name"/>
+          </Element>
+        </Elements>
+      </Element>
+      <ElementRef Id="DefaultInterface"/>
+      <ElementRef Id="DefaultType"/>
+      <Element Id="DefaultNamespace" Type="Namespace">
+        <Sort By="Name"/>
+        <Elements>
+          <ElementRef Id="DefaultUsing"/>
+          <ElementRef Id="DefaultConditional"/>
+          <Region Name="Enumerations">
+            <Elements>
+              <Element Id ="DefaultEnumeration" Type="Type">
+                <Sort By="Access" Direction="Descending">
+                  <Sort By="Name"/>
+                </Sort>
+                <Filter Condition="$(Type) == 'Enum'"/>
+              </Element>
+            </Elements>
+          </Region>
+          <Region Name="Delegates">
+            <Elements>
+              <Element Id="DefaultDelegate" Type="Delegate">
+                <Sort By="Access" Direction="Descending">
+                  <Sort By="Name"/>
+                </Sort>
+              </Element>
+            </Elements>
+          </Region>
+          <Region Name="Types" DirectivesEnabled="false">
+            <Elements>
+              <Element Id="DefaultInterface"  Type="Type">
+                <!-- Interfaces only -->
+                <Sort By="Type" Direction="Descending">
+                  <Sort By="Access" Direction="Descending">
+                    <Sort By="Name"/>
+                  </Sort>
+                </Sort>
+                <Filter Condition="$(Type) == 'Interface'"/>
+                <Elements>
+                  <ElementRef Id="DefaultConditional"/>
+                  <Region Name="Properties">
+                    <Elements>
+                      <Element Type="Property">
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Events">
+                    <Elements>
+                      <Element Type="Event">
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Public Methods">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Access) == 'Public'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Protected Methods">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Access) == 'Protected'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Private Methods">
+                    <Elements>
+                      <Element Type="Method">
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Access) != 'Public'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                </Elements>
+              </Element>
+              <!-- End Interface -->
+              <Element Id="DefaultType" Type="Type">
+                <!-- Classes and structures -->
+                <Sort By="Type" Direction="Descending">
+                  <Sort By="Access" Direction="Descending">
+                    <Sort By="Name"/>
+                  </Sort>
+                </Sort>
+                <Elements>
+                  <ElementRef Id="DefaultConditional"/>
+                  <Region Name="Fixed Fields" DirectivesEnabled="false">
+                    <Elements>
+                      <Element Type="Field">
+                        <Filter Condition="$(Parent.Attributes) : 'StructLayout' And !($(Modifier) : 'Static')"/>
+                        <!-- Do not sort or group fields that are members of a type with a StructLayout attribute -->
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Fields">
+                    <Elements>
+                      <Element Type="Field">
+                        <Sort By="Name"/>
+                        <Filter Condition="!($(Name) =~ '.*Event')"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Enumerations">
+                    <Elements>
+                      <ElementRef Id ="DefaultEnumeration"/>
+                    </Elements>
+                  </Region>
+                  <Region Name="Nested Interfaces">
+                    <Elements>
+                      <ElementRef Id="DefaultInterface"/>
+                    </Elements>
+                  </Region>
+                  <Region Name="Properties">
+                    <Elements>
+                      <Element Type="Property">
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+
+                  <Region Name="Event Fields">
+                    <Elements>
+                      <Element Type="Field">
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Name) =~ '.*Event'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Events">
+                    <Elements>
+                      <Element Type="Event">
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Invoke Methods">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Name) =~ 'Invoke.*'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+
+                  <Region Name="Delegates">
+                    <Elements>
+                      <ElementRef Id ="DefaultDelegate"/>
+                    </Elements>
+                  </Region>
+                  <Region Name="Constructors">
+                    <Elements>
+                      <Element Type="Constructor">
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Dispose">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Name) == 'Dispose'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Public Methods">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Access) == 'Public'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Protected Methods">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                        <Filter Condition="$(Access) == 'Protected'"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Private Methods">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                  <Region Name="Nested Types">
+                    <Elements>
+                      <ElementRef Id="DefaultType"/>
+                    </Elements>
+                  </Region>
+                  <Region Name="Other">
+                    <Elements>
+                      <Element>
+                        <Sort By="Name"/>
+                      </Element>
+                    </Elements>
+                  </Region>
+                </Elements>
+              </Element>
+              <!-- End Type -->
+            </Elements>
+          </Region>
+        </Elements>
+      </Element>
+      <!-- End Namespace -->
+    </Elements>
+  </CodeConfiguration>

@@ -1,0 +1,3 @@
+installers/*
+.idea*
+*.pyc

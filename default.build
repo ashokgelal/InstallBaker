@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<project name="InstallBaker" default="all" basedir=".">
+
+  <target name="all" depends="beautify">
+  </target>
+
+  <target name="beautify" append="true" >
+    <echo message="Starting beautify" />
+    <exec program="bash.exe">
+      <arg value="../tools/beautify.sh" />
+      <arg value="../tools" />
+    </exec>
+    <echo message="Finished beautify" />
+  </target>
+</project>

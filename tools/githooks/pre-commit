@@ -1,0 +1,9 @@
+#!/bin/bash
+
+tools/test-multiple-classes.sh
+errors=$(( $errors + $? ))
+
+tools/test-bad-conversions.sh
+
+#exit $errors
+exit 0

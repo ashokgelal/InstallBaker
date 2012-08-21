@@ -1,0 +1,3 @@
+[submodule "DietMvvm"]
+	path = DietMvvm
+	url = git@github.com:ashokgelal/DietMvvm.git
