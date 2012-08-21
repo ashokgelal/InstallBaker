@@ -3,7 +3,7 @@
   <Metadata>
     <Identity Id="6c51d14e-cdbe-4cc1-a158-3fa4376d51fb" Version="0.1" Language="en-US" Publisher="Ashok Gelal" />
     <DisplayName>InstallBaker</DisplayName>
-    <Description>Information about my package</Description>
+    <Description>Automagic installer baker for WIX based .net Projects</Description>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />

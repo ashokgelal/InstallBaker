@@ -86,7 +86,6 @@ namespace AshokGelal.InstallBaker
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
-
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
         /// See the Initialize method to see how the menu item is associated to this function using
@@ -125,7 +124,7 @@ namespace AshokGelal.InstallBaker
             ToolWindowPane window = this.FindToolWindow(typeof(MyToolWindow), 0, true);
             if ((null == window) || (null == window.Frame))
             {
-                throw new NotSupportedException(Resources.CanNotCreateWindow);
+                throw new NotSupportedException(Properties.Resources.CanNotCreateWindow);
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
