@@ -1,4 +1,6 @@
-﻿/***************************************************************************
+﻿#region Header
+
+/***************************************************************************
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 This code is licensed under the Visual Studio SDK license terms.
@@ -9,22 +11,29 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+#endregion Header
+
 using System;
 using System.Collections;
-using System.Text;
-using System.Reflection;
 using System.ComponentModel.Design;
-using Microsoft.VsSDK.UnitTestLibrary;
+using System.Reflection;
+using System.Text;
+
+using AshokGelal.InstallBaker;
+using AshokGelal.InstallBaker.Integration;
+
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.Shell;
-using AshokGelal.InstallBaker;
+using Microsoft.VsSDK.UnitTestLibrary;
 
 namespace InstallBaker_UnitTests.MenuItemTests
 {
-    [TestClass()]
+    [TestClass]
     public class MenuItemTest
     {
+        #region Public Methods
+
         /// <summary>
         /// Verify that a new menu command object gets added to the OleMenuCommandService. 
         /// This action takes place In the Initialize method of the Package object
@@ -43,7 +52,7 @@ namespace InstallBaker_UnitTests.MenuItemTests
             Assert.AreEqual(0, package.SetSite(serviceProvider), "SetSite did not return S_OK");
 
             //Verify that the menu command can be found
-            CommandID menuCommandID = new CommandID(AshokGelal.InstallBaker.GuidList.guidInstallBakerCmdSet, (int)AshokGelal.InstallBaker.PkgCmdIDList.cmdIdInstallBaker);
+            CommandID menuCommandID = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBaker);
             System.Reflection.MethodInfo info = typeof(Package).GetMethod("GetService", BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.IsNotNull(info);
             OleMenuCommandService mcs = info.Invoke(package, new object[] { (typeof(IMenuCommandService)) }) as OleMenuCommandService;
@@ -74,7 +83,8 @@ namespace InstallBaker_UnitTests.MenuItemTests
 
             //Clean up services
             serviceProvider.RemoveService(typeof(SVsUIShell));
-
         }
+
+        #endregion Public Methods
     }
 }

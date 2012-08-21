@@ -1,12 +1,16 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
+using AshokGelal.InstallBaker.Integration;
+
+using EnvDTE;
+
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VSSDK.Tools.VsIdeTesting;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell;
-using EnvDTE;
 
 namespace InstallBaker_IntegrationTests
 {
@@ -16,9 +20,13 @@ namespace InstallBaker_IntegrationTests
     [TestClass]
     public class PackageTest
     {
-        private delegate void ThreadInvoker();
+        #region Fields
 
         private TestContext testContextInstance;
+
+        #endregion Fields
+
+        #region Properties
 
         /// <summary>
         ///Gets or sets the test context which provides
@@ -36,6 +44,16 @@ namespace InstallBaker_IntegrationTests
             }
         }
 
+        #endregion Properties
+
+        #region Invoke Methods
+
+        private delegate void ThreadInvoker();
+
+        #endregion Invoke Methods
+
+        #region Public Methods
+
         [TestMethod]
         [HostType("VS IDE")]
         public void PackageLoadTest()
@@ -49,11 +67,13 @@ namespace InstallBaker_IntegrationTests
 
                 //Validate package load
                 IVsPackage package;
-                Guid packageGuid = new Guid(AshokGelal.InstallBaker.GuidList.guidInstallBakerPkgString);
+                Guid packageGuid = new Guid(GuidList.guidInstallBakerPkgString);
                 Assert.IsTrue(0 == shellService.LoadPackage(ref packageGuid, out package));
                 Assert.IsNotNull(package, "Package failed to load");
 
             });
         }
+
+        #endregion Public Methods
     }
 }

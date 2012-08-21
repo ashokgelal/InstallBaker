@@ -1,21 +1,28 @@
 ﻿using System;
-using System.Globalization;
 using System.ComponentModel.Design;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Globalization;
+
+using AshokGelal.InstallBaker.Integration;
+
 using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VsSDK.IntegrationTestLibrary;
 using Microsoft.VSSDK.Tools.VsIdeTesting;
 
 namespace InstallBaker_IntegrationTests
 {
-    [TestClass()]
+    [TestClass]
     public class MenuItemTest
     {
-        private delegate void ThreadInvoker();
+        #region Fields
 
         private TestContext testContextInstance;
+
+        #endregion Fields
+
+        #region Properties
 
         /// <summary>
         ///Gets or sets the test context which provides
@@ -33,16 +40,26 @@ namespace InstallBaker_IntegrationTests
             }
         }
 
+        #endregion Properties
+
+        #region Invoke Methods
+
+        private delegate void ThreadInvoker();
+
+        #endregion Invoke Methods
+
+        #region Public Methods
+
         /// <summary>
         ///A test for lauching the command and closing the associated dialogbox
         ///</summary>
-        [TestMethod()]
+        [TestMethod]
         [HostType("VS IDE")]
         public void LaunchCommand()
         {
             UIThreadInvoker.Invoke((ThreadInvoker)delegate()
             {
-                CommandID menuItemCmd = new CommandID(AshokGelal.InstallBaker.GuidList.guidInstallBakerCmdSet, (int)AshokGelal.InstallBaker.PkgCmdIDList.cmdIdInstallBaker);
+                CommandID menuItemCmd = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBaker);
 
                 // Create the DialogBoxListener Thread.
                 string expectedDialogBoxText = string.Format(CultureInfo.CurrentCulture, "{0}\n\nInside {1}.MenuItemCallback()", "InstallBaker", "AshokGelal.InstallBaker.InstallBakerPackage");
@@ -62,5 +79,6 @@ namespace InstallBaker_IntegrationTests
             });
         }
 
+        #endregion Public Methods
     }
 }

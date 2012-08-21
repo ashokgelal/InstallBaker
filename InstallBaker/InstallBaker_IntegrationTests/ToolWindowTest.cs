@@ -1,21 +1,27 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AshokGelal.InstallBaker.Integration;
+
 using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VsSDK.IntegrationTestLibrary;
 using Microsoft.VSSDK.Tools.VsIdeTesting;
 
 namespace InstallBaker_IntegrationTests
 {
-
-    [TestClass()]
+    [TestClass]
     public class ToolWindowTest
     {
-        private delegate void ThreadInvoker();
+        #region Fields
 
         private TestContext testContextInstance;
+
+        #endregion Fields
+
+        #region Properties
 
         /// <summary>
         ///Gets or sets the test context which provides
@@ -33,24 +39,35 @@ namespace InstallBaker_IntegrationTests
             }
         }
 
+        #endregion Properties
+
+        #region Invoke Methods
+
+        private delegate void ThreadInvoker();
+
+        #endregion Invoke Methods
+
+        #region Public Methods
+
         /// <summary>
         ///A test for showing the toolwindow
         ///</summary>
-        [TestMethod()]
+        [TestMethod]
         [HostType("VS IDE")]
         public void ShowToolWindow()
         {
             UIThreadInvoker.Invoke((ThreadInvoker)delegate()
             {
-                CommandID toolWindowCmd = new CommandID(AshokGelal.InstallBaker.GuidList.guidInstallBakerCmdSet, (int)AshokGelal.InstallBaker.PkgCmdIDList.cmdIdInstallBakerToolWindow);
+                CommandID toolWindowCmd = new CommandID(GuidList.guidInstallBakerCmdSet, (int)PkgCmdIDList.cmdIdInstallBakerToolWindow);
 
                 TestUtils testUtils = new TestUtils();
                 testUtils.ExecuteCommand(toolWindowCmd);
 
-                Assert.IsTrue(testUtils.CanFindToolwindow(new Guid(AshokGelal.InstallBaker.GuidList.guidToolWindowPersistanceString)));
+                Assert.IsTrue(testUtils.CanFindToolwindow(new Guid(GuidList.guidToolWindowPersistanceString)));
 
             });
         }
 
+        #endregion Public Methods
     }
 }

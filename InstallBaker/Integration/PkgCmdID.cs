@@ -1,8 +1,7 @@
 ﻿// PkgCmdID.cs
 // MUST match PkgCmdID.h
-using System;
 
-namespace AshokGelal.InstallBaker
+namespace AshokGelal.InstallBaker.Integration
 {
     static class PkgCmdIDList
     {

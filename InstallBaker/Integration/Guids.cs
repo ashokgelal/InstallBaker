@@ -1,8 +1,9 @@
 ﻿// Guids.cs
 // MUST match guids.h
+
 using System;
 
-namespace AshokGelal.InstallBaker
+namespace AshokGelal.InstallBaker.Integration
 {
     static class GuidList
     {
