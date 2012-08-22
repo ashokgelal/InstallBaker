@@ -1,15 +1,39 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 
 namespace AshokGelal.InstallBaker.Events
 {
+    [Export]
     internal class BaseEventsService : IDisposable
     {
+        #region Fields
+
         protected readonly InstallBakerEventAggregator _eventAggregator;
+
+        #endregion Fields
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is disposed.
+        /// </summary>
+        protected bool IsDisposed
+        {
+            get; set;
+        }
+
+        #endregion Properties
+
+        #region Constructors
 
         public BaseEventsService(InstallBakerEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
         }
+
+        #endregion Constructors
+
+        #region Dispose
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -32,9 +56,6 @@ namespace AshokGelal.InstallBaker.Events
             }
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is disposed.
-        /// </summary>
-        protected bool IsDisposed { get; set; }
+        #endregion Dispose
     }
 }

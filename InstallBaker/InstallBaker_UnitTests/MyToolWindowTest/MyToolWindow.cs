@@ -19,7 +19,7 @@ using System.Reflection;
 using System.Text;
 
 using AshokGelal.InstallBaker;
-using AshokGelal.InstallBaker.UI;
+using AshokGelal.InstallBaker.Views;
 
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,16 +38,16 @@ namespace InstallBaker_UnitTests.MyToolWindowTest
         #region Public Methods
 
         /// <summary>
-        ///MyToolWindow Constructor test
+        ///InstallBakerToolWindow Constructor test
         ///</summary>
         [TestMethod]
         public void MyToolWindowConstructorTest()
         {
-            MyToolWindow target = new MyToolWindow();
-            Assert.IsNotNull(target, "Failed to create an instance of MyToolWindow");
+            InstallBakerToolWindow target = new InstallBakerToolWindow();
+            Assert.IsNotNull(target, "Failed to create an instance of InstallBakerToolWindow");
 
             MethodInfo method = target.GetType().GetMethod("get_Content", BindingFlags.Public | BindingFlags.Instance);
-            Assert.IsNotNull(method.Invoke(target, null), "MyControl object was not instantiated");
+            Assert.IsNotNull(method.Invoke(target, null), "ToolWindowView object was not instantiated");
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace InstallBaker_UnitTests.MyToolWindowTest
         [TestMethod]
         public void WindowPropertyTest()
         {
-            MyToolWindow target = new MyToolWindow();
+            InstallBakerToolWindow target = new InstallBakerToolWindow();
             Assert.IsNotNull(target.Content, "Content property was null");
         }
 

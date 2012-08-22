@@ -1,10 +1,10 @@
 using System;
 
-namespace AshokGelal.InstallBaker.Events
+namespace AshokGelal.InstallBaker.Models
 {
-    internal class BuildConfig : EventArgs
+    public class BuildConfig : EventArgs
     {
-        public ProjectInfo ProjectInfo { get; private set; }
+        public ProjectInfo ItsProjectInfo { get; private set; }
         public string ItsProjectConfig { get; private set; }
         public string ItsPlatform { get; private set; }
         public string ItsSolutionConfig { get; private set; }
@@ -12,7 +12,7 @@ namespace AshokGelal.InstallBaker.Events
 
         public BuildConfig(ProjectInfo projectInfo, string projectConfig, string platform, string solutionConfig)
         {
-            ProjectInfo = projectInfo;
+            ItsProjectInfo = projectInfo;
             ItsProjectConfig = projectConfig;
             ItsPlatform = platform;
             ItsSolutionConfig = solutionConfig;

@@ -1,18 +1,31 @@
-﻿using EnvDTE;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using AshokGelal.InstallBaker.Events;
+using AshokGelal.InstallBaker.Models;
+using EnvDTE;
 
-namespace AshokGelal.InstallBaker.Events
+namespace AshokGelal.InstallBaker.Services
 {
     internal class BuildProgressService : BaseEventsService
     {
+        #region Fields
+
         private const string InstallerProjectName = "Installer.wixproj";
-        private readonly BuildEvents _buildEvents;
-        private readonly Solution _currentSolution;
         private readonly Dictionary<string, ProjectInfo> _availableProjectsDict;
+        private readonly Solution _currentSolution;
+
+        #endregion Fields
+
+        #region Event Fields
+
+        private readonly BuildEvents _buildEvents;
+
+        #endregion Event Fields
+
+        #region Constructors
 
         public BuildProgressService(InstallBakerEventAggregator eventAggregator, BuildEvents buildEvents, Solution currentSolution)
             : base(eventAggregator)
@@ -23,12 +36,38 @@ namespace AshokGelal.InstallBaker.Events
             HookEvents();
         }
 
-        private void HookEvents()
+        #endregion Constructors
+
+        #region Dispose
+
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
         {
-            _buildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
-            _buildEvents.OnBuildProjConfigBegin += BuildEvents_OnBuildProjConfigBegin;
-            _buildEvents.OnBuildProjConfigDone += BuildEvents_OnBuildProjConfigDone;
-            _buildEvents.OnBuildDone += BuildEvents_OnBuildDone;
+            if (!IsDisposed)
+            {
+                IsDisposed = true;
+
+                if (disposing && _buildEvents != null)
+                    UnHookEvents();
+            }
+        }
+
+        #endregion Dispose
+
+        #region Private Methods
+
+        /// <summary>
+        /// Event raise when a build being
+        /// </summary>
+        /// <param name="scope">The scope.</param>
+        /// <param name="action">The action.</param>
+        private void BuildEvents_OnBuildBegin(vsBuildScope scope, vsBuildAction action)
+        {
+            PopulateProjectsInfo();
+            _eventAggregator.PublishEvent(_eventAggregator.BuildStarted, _availableProjectsDict.Values.ToList());
         }
 
         /// <summary>
@@ -39,34 +78,6 @@ namespace AshokGelal.InstallBaker.Events
         private void BuildEvents_OnBuildDone(vsBuildScope scope, vsBuildAction action)
         {
             _eventAggregator.PublishEvent(_eventAggregator.BuildFinished);
-        }
-
-        /// <summary>
-        /// Event raised when the build of an individual project is done.
-        /// </summary>
-        /// <param name="project">The project.</param>
-        /// <param name="projectConfig">The project config.</param>
-        /// <param name="platform">The platform.</param>
-        /// <param name="solutionConfig">The solution config.</param>
-        /// <param name="success">True if project build was successful, otherwise false.</param>
-        private void BuildEvents_OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
-        {
-            ProjectInfo projectInfo;
-            if (_availableProjectsDict.TryGetValue(project, out projectInfo))
-            {
-                var config = new BuildConfig(projectInfo, projectConfig, platform, solutionConfig) { ItsSuccessFlag = success };
-
-                if (projectInfo.ItsStartupProjectFlag)
-                    _eventAggregator.PublishEvent(_eventAggregator.StartupProjectBuildFinished, config);
-                else
-                {
-                    var fileName = Path.GetFileName(project);
-                    if (fileName != null && fileName.Equals(InstallerProjectName, StringComparison.CurrentCultureIgnoreCase))
-                        _eventAggregator.PublishEvent(_eventAggregator.InstallerProjectBuildFinished, config);
-                    else
-                        _eventAggregator.PublishEvent(_eventAggregator.IndividualProjectBuildFinished, config);
-                }
-            }
         }
 
         /// <summary>
@@ -98,14 +109,39 @@ namespace AshokGelal.InstallBaker.Events
         }
 
         /// <summary>
-        /// Event raise when a build being
+        /// Event raised when the build of an individual project is done.
         /// </summary>
-        /// <param name="scope">The scope.</param>
-        /// <param name="action">The action.</param>
-        private void BuildEvents_OnBuildBegin(vsBuildScope scope, vsBuildAction action)
+        /// <param name="project">The project.</param>
+        /// <param name="projectConfig">The project config.</param>
+        /// <param name="platform">The platform.</param>
+        /// <param name="solutionConfig">The solution config.</param>
+        /// <param name="success">True if project build was successful, otherwise false.</param>
+        private void BuildEvents_OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
         {
-            PopulateProjectsInfo();
-            _eventAggregator.PublishEvent(_eventAggregator.BuildStarted, _availableProjectsDict.Values.ToList());
+            ProjectInfo projectInfo;
+            if (_availableProjectsDict.TryGetValue(project, out projectInfo))
+            {
+                var config = new BuildConfig(projectInfo, projectConfig, platform, solutionConfig) { ItsSuccessFlag = success };
+
+                if (projectInfo.ItsStartupProjectFlag)
+                    _eventAggregator.PublishEvent(_eventAggregator.StartupProjectBuildFinished, config);
+                else
+                {
+                    var fileName = Path.GetFileName(project);
+                    if (fileName != null && fileName.Equals(InstallerProjectName, StringComparison.CurrentCultureIgnoreCase))
+                        _eventAggregator.PublishEvent(_eventAggregator.InstallerProjectBuildFinished, config);
+                    else
+                        _eventAggregator.PublishEvent(_eventAggregator.IndividualProjectBuildFinished, config);
+                }
+            }
+        }
+
+        private void HookEvents()
+        {
+            _buildEvents.OnBuildBegin += BuildEvents_OnBuildBegin;
+            _buildEvents.OnBuildProjConfigBegin += BuildEvents_OnBuildProjConfigBegin;
+            _buildEvents.OnBuildProjConfigDone += BuildEvents_OnBuildProjConfigDone;
+            _buildEvents.OnBuildDone += BuildEvents_OnBuildDone;
         }
 
         private void PopulateProjectsInfo()
@@ -134,21 +170,6 @@ namespace AshokGelal.InstallBaker.Events
             }
         }
 
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (!IsDisposed)
-            {
-                IsDisposed = true;
-
-                if (disposing && _buildEvents != null)
-                    UnHookEvents();
-            }
-        }
-
         private void UnHookEvents()
         {
             _buildEvents.OnBuildBegin -= BuildEvents_OnBuildBegin;
@@ -156,5 +177,7 @@ namespace AshokGelal.InstallBaker.Events
             _buildEvents.OnBuildProjConfigDone -= BuildEvents_OnBuildProjConfigDone;
             _buildEvents.OnBuildDone -= BuildEvents_OnBuildDone;
         }
+
+        #endregion Private Methods
     }
 }

@@ -1,6 +1,6 @@
-namespace AshokGelal.InstallBaker.Events
+namespace AshokGelal.InstallBaker.Models
 {
-    internal class ProjectInfo
+    public class ProjectInfo
     {
         public ProjectInfo(string name, string rootloc, string outputdir)
         {

@@ -9,14 +9,13 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using System.IO;
+
 namespace Microsoft.VsSDK.IntegrationTestLibrary
 {
     using System;
-    using System.Collections.Generic;
     using System.Text;
     using System.Runtime.InteropServices;
-    using System.Threading;
-    using Microsoft.VisualStudio.Shell.Interop;
 
     /// <summary>
     /// Defines pinvoked utility methods and internal VS Constants
@@ -30,22 +29,22 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
         internal static extern UInt32 SendMessage(IntPtr hWnd, UInt32 Msg,
             UInt32 wParam, IntPtr lParam);
 
-        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
-        internal static extern bool PeekMessage([In, Out] ref Microsoft.VisualStudio.OLE.Interop.MSG msg, HandleRef hwnd, int msgMin, int msgMax, int remove);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        internal static extern bool PeekMessage([In, Out] ref VisualStudio.OLE.Interop.MSG msg, HandleRef hwnd, int msgMin, int msgMax, int remove);
 
-        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
-        internal static extern bool TranslateMessage([In, Out] ref Microsoft.VisualStudio.OLE.Interop.MSG msg);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        internal static extern bool TranslateMessage([In, Out] ref VisualStudio.OLE.Interop.MSG msg);
 
-        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
-        internal static extern int DispatchMessage([In] ref Microsoft.VisualStudio.OLE.Interop.MSG msg);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        internal static extern int DispatchMessage([In] ref VisualStudio.OLE.Interop.MSG msg);
 
-        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool attach);
 
-        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-        [DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         internal static extern uint GetCurrentThreadId();
 
         [DllImport("user32")]
@@ -54,7 +53,7 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
         [DllImport("user32")]
         internal static extern bool IsWindowVisible(IntPtr hDlg);
 
-        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern IntPtr SetFocus(IntPtr hWnd);
 
         [DllImport("user32")]
@@ -108,9 +107,7 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
         internal static long HResultFromWin32(long error)
         {
             if (error <= 0)
-            {
                 return error;
-            }
 
             return ((error & 0x0000FFFF) | (Facility_Win32 << 16) | 0x80000000);
         }
@@ -120,25 +117,18 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
         /// </devdoc>
         public static bool IsSamePath(string file1, string file2)
         {
-            if (file1 == null || file1.Length == 0)
-            {
-                return (file2 == null || file2.Length == 0);
-            }
-
-            Uri uri1 = null;
-            Uri uri2 = null;
+            if (string.IsNullOrEmpty(file1))
+                return string.IsNullOrEmpty(file2);
 
             try
             {
+                Uri uri1;
+                Uri uri2;
                 if (!Uri.TryCreate(file1, UriKind.Absolute, out uri1) || !Uri.TryCreate(file2, UriKind.Absolute, out uri2))
-                {
                     return false;
-                }
 
                 if (uri1 != null && uri1.IsFile && uri2 != null && uri2.IsFile)
-                {
                     return 0 == String.Compare(uri1.LocalPath, uri2.LocalPath, StringComparison.OrdinalIgnoreCase);
-                }
 
                 return file1 == file2;
             }
@@ -150,5 +140,60 @@ namespace Microsoft.VsSDK.IntegrationTestLibrary
             return false;
         }
 
+        #region Public Methods
+
+        public static class FILE_ATTRIBUTE
+        {
+            public const uint FILE_ATTRIBUTE_NORMAL = 0x80;
+        }
+
+        [DllImport("kernel32.dll")]
+        public static extern bool FindClose(IntPtr hFindFile);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr FindFirstFileW(string lpFileName, out WIN32_FIND_DATAW lpFindFileData);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        public static extern bool FindNextFile(IntPtr hFindFile, out WIN32_FIND_DATAW lpFindFileData);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SHFILEINFO
+        {
+            public IntPtr hIcon;
+            public int iIcon;
+            public uint dwAttributes;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            public string szDisplayName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
+            public string szTypeName;
+        }
+
+        [DllImport("shell32.dll")]
+        public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
+
+        public static class SHGFI
+        {
+            public const uint SHGFI_TYPENAME = 0x000000400;
+            public const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct WIN32_FIND_DATAW
+        {
+            public FileAttributes dwFileAttributes;
+            internal System.Runtime.InteropServices.ComTypes.FILETIME ftCreationTime;
+            internal System.Runtime.InteropServices.ComTypes.FILETIME ftLastAccessTime;
+            internal System.Runtime.InteropServices.ComTypes.FILETIME ftLastWriteTime;
+            public uint nFileSizeHigh;
+            public uint nFileSizeLow;
+            public uint dwReserved0;
+            public uint dwReserved1;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            public string cFileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
+            public string cAlternateFileName;
+        }
+
+        #endregion Public Methods
     }
 }

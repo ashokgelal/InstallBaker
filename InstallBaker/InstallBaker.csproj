@@ -53,6 +53,7 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -122,14 +123,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Events\BaseEventsService.cs" />
-    <Compile Include="Events\BuildProgressService.cs" />
-    <Compile Include="Events\BuildConfig.cs" />
+    <Compile Include="Services\BuildProgressService.cs" />
+    <Compile Include="Models\BuildConfig.cs" />
     <Compile Include="Events\InstallBakerEventAggregator.cs" />
-    <Compile Include="Events\ProjectInfo.cs" />
-    <Compile Include="UI\MyControl.xaml.cs">
-      <DependentUpon>MyControl.xaml</DependentUpon>
+    <Compile Include="Models\ProjectInfo.cs" />
+    <Compile Include="Services\DependenciesRegistry.cs" />
+    <Compile Include="ViewModels\ToolWindowViewModel.cs" />
+    <Compile Include="Views\ToolWindowView.xaml.cs">
+      <DependentUpon>ToolWindowView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\MyToolWindow.cs" />
+    <Compile Include="Views\InstallBakerToolWindow.cs" />
     <Compile Include="Integration\Guids.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -172,17 +175,22 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="UI\MyControl.xaml">
+    <Page Include="Views\ToolWindowView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CWEngine.Shared.FileSystemService\CWEngine.Shared.FileSystemService.csproj">
+      <Project>{af3bb323-36a7-4de0-94cd-201bb4c371b8}</Project>
+      <Name>CWEngine.Shared.FileSystemService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DietMvvm\DietMvvm\DietMvvm\DietMvvm.csproj">
       <Project>{25b95c3e-4ef7-41c9-b649-0645754152de}</Project>
       <Name>DietMvvm</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
