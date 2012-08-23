@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
     <Reference Include="System.Xaml" />
   </ItemGroup>
@@ -123,11 +124,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Events\BaseEventsService.cs" />
+    <Compile Include="Helpers\Utilities.cs" />
+    <Compile Include="Models\BakeMetaData.cs" />
     <Compile Include="Services\BuildProgressService.cs" />
     <Compile Include="Models\BuildConfig.cs" />
     <Compile Include="Events\InstallBakerEventAggregator.cs" />
     <Compile Include="Models\ProjectInfo.cs" />
     <Compile Include="Services\DependenciesRegistry.cs" />
+    <Compile Include="Services\SolutionManagementService.cs" />
     <Compile Include="ViewModels\ToolWindowViewModel.cs" />
     <Compile Include="Views\ToolWindowView.xaml.cs">
       <DependentUpon>ToolWindowView.xaml</DependentUpon>

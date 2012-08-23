@@ -46,6 +46,7 @@ namespace AshokGelal.InstallBaker
         /// The top level application instance of the VS IDE that is executing this package.
         /// </summary>
         private DTE2 _ide;
+        private InstallBakerToolWindow _toolbarWindow;
 
         #endregion Fields
 
@@ -65,6 +66,16 @@ namespace AshokGelal.InstallBaker
         public double IDEVersion
         {
             get { return Convert.ToDouble(IDE.Version, CultureInfo.InvariantCulture); }
+        }
+
+        internal InstallBakerToolWindow ToolbarWindow
+        {
+            get
+            {
+                return _toolbarWindow ??
+                       (_toolbarWindow =
+                        (InstallBakerToolWindow) FindToolWindow(typeof (InstallBakerToolWindow), 0, true));
+            }
         }
 
         #endregion Properties

@@ -1,20 +1,36 @@
+using AshokGelal.InstallBaker.Helpers;
+
 namespace AshokGelal.InstallBaker.Models
 {
     public class ProjectInfo
     {
-        public ProjectInfo(string name, string rootloc, string outputdir)
+        #region Properties
+
+        public string ItsName
         {
-            ItsName = name;
-            ItsRootDir = rootloc;
-            ItsOutputDir = outputdir;
+            get; private set;
         }
 
-        public string ItsOutputDir { get; private set; }
+        public ProjectPaths ItsProjectPaths
+        {
+            get; private set;
+        }
 
-        public string ItsRootDir { get;  private set; }
+        public bool ItsStartupProjectFlag
+        {
+            get; set;
+        }
 
-        public string ItsName { get; private set; }
+        #endregion Properties
 
-        public bool ItsStartupProjectFlag { get; private set; }
+        #region Constructors
+
+        public ProjectInfo(string name, ProjectPaths projectPaths)
+        {
+            ItsName = name;
+            ItsProjectPaths = projectPaths;
+        }
+
+        #endregion Constructors
     }
 }

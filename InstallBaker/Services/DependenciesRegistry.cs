@@ -1,21 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using AshokGelal.InstallBaker.Events;
 using AshokGelal.InstallBaker.Models;
+
 using CWEngine.Shared.FileSystemService;
+using CWEngine.Shared.FileSystemService.Helpers;
 using CWEngine.Shared.FileSystemService.Models;
+
 using DietMvvm.Events;
 
 namespace AshokGelal.InstallBaker.Services
 {
     internal class DependenciesRegistry : IDisposable
     {
+        #region Fields
+
         private readonly InstallBakerEventAggregator _eventAggregator;
+        private List<string> _excludedExtensions;
         private FileSystemService _fileSystemSerivce;
+        private List<FileEntry> _tempFiles;
+
+        #endregion Fields
+
+        #region Properties
+
+        public List<FileEntry> ItsExcludedFileEntries
+        {
+            get; private set;
+        }
+
+        public Dictionary<int, FileEntry> ItsIncludedFileEntriesDict
+        {
+            get; private set;
+        }
+
+        public List<FileEntry> ItsNewFileEntries
+        {
+            get; private set;
+        }
+
+        #endregion Properties
+
+        #region Event Fields
+
         public EmptyArgsEventHandler DependenciesRegistryUpdateEvent;
-        public Dictionary<int, FileEntry> ItsNewFileEntriesDict { get; private set; }
-        public Dictionary<int, FileEntry> ItsIncludedFileEntriesDict { get; private set; }
-        public Dictionary<int, FileEntry> ItsExcludedFileEntriesDict { get; private set; }
+
+        #endregion Event Fields
+
+        #region Constructors
 
         public DependenciesRegistry(InstallBakerEventAggregator eventAggregator)
         {
@@ -24,13 +57,59 @@ namespace AshokGelal.InstallBaker.Services
             HookEvents();
         }
 
-        private void Initialize()
+        #endregion Constructors
+
+        #region Dispose
+
+        public void Dispose()
         {
-            _fileSystemSerivce = new FileSystemService();
-            DependenciesRegistryUpdateEvent = new EmptyArgsEventHandler();
-            ItsNewFileEntriesDict = new Dictionary<int, FileEntry>();
-            ItsIncludedFileEntriesDict = new Dictionary<int, FileEntry>();
-            ItsExcludedFileEntriesDict = new Dictionary<int, FileEntry>();
+            UnHookEvents();
+            _fileSystemSerivce.StopScan();
+        }
+
+        #endregion Dispose
+
+        #region Private Methods
+
+        private void BuildStartedEventHandler(object sender, SingleEventArgs<List<ProjectInfo>> e)
+        {
+            ItsNewFileEntries.Clear();
+        }
+
+        private void FileSystemService_FileEntryAvailableEventHandler(object sender, SingleEventArgs<FileEntry> e)
+        {
+            var hash = e.ItsValue.GetHashCode();
+            if(!ItsIncludedFileEntriesDict.ContainsKey(hash))
+                _tempFiles.Add(e.ItsValue);
+        }
+
+        private void FileSystemService_ScanStatusChangedEventHandler(object sender, SingleEventArgs<ScanStatus> e)
+        {
+            switch (e.ItsValue)
+            {
+                case ScanStatus.Started:
+                    ItsNewFileEntries.Clear();
+                    _tempFiles.Clear();
+                    break;
+                case ScanStatus.Completed:
+                    FilterFiles();
+                    break;
+            }
+
+            RaiseRegistryUpdateEvent();
+        }
+
+        private void FilterFiles()
+        {
+            var lists = RegExFileEntrieFilterService.FilterFileEntries(_excludedExtensions, _tempFiles);
+            foreach (var entry in lists.ItsNonMatchedFileEntries)
+            {
+                if(!ItsNewFileEntries.Contains(entry))
+                  ItsNewFileEntries.Add(entry);
+            //                ItsIncludedFileEntriesDict.Add(entry.GetHashCode(), entry);
+            }
+
+            ItsExcludedFileEntries = lists.ItsMatchedFileEntries;
         }
 
         private void HookEvents()
@@ -41,19 +120,15 @@ namespace AshokGelal.InstallBaker.Services
             _fileSystemSerivce.ItsScanStatusChangedEvent.ItsEvent += FileSystemService_ScanStatusChangedEventHandler;
         }
 
-        private void FileSystemService_ScanStatusChangedEventHandler(object sender, SingleEventArgs<ScanStatus> e)
+        private void Initialize()
         {
-            switch (e.ItsValue)
-            {
-                case ScanStatus.Stopped:
-                case ScanStatus.Started:
-                case ScanStatus.Cancelled:
-                    ItsNewFileEntriesDict.Clear();
-                    break;
-                case ScanStatus.Completed:
-                    break;
-            }
-            RaiseRegistryUpdateEvent();
+            _fileSystemSerivce = new FileSystemService();
+            DependenciesRegistryUpdateEvent = new EmptyArgsEventHandler();
+            ItsNewFileEntries = new List<FileEntry>();
+            _tempFiles = new List<FileEntry>();
+            ItsIncludedFileEntriesDict = new Dictionary<int, FileEntry>();
+            ItsExcludedFileEntries = new List<FileEntry>();
+            _excludedExtensions = new List<string> { "*.pdb", "*.manifest", "*.vshost.exe.*","*.vshost.exe"};
         }
 
         private void RaiseRegistryUpdateEvent()
@@ -61,25 +136,9 @@ namespace AshokGelal.InstallBaker.Services
             DependenciesRegistryUpdateEvent.Raise(this);
         }
 
-        private void FileSystemService_FileEntryAvailableEventHandler(object sender, SingleEventArgs<FileEntry> e)
-        {
-            var hash = e.ItsValue.GetHashCode();
-            if(!ItsIncludedFileEntriesDict.ContainsKey(hash))
-                ItsNewFileEntriesDict.Add(hash, e.ItsValue);
-        }
-
         private void StartupProjectBuildFinishedEventHandler(object sender, BuildConfig e)
         {
-            _fileSystemSerivce.StartScanAsync(e.ItsProjectInfo.ItsOutputDir);
-        }
-
-        private void BuildStartedEventHandler(object sender, SingleEventArgs<List<ProjectInfo>> e)
-        {
-        }
-
-        public void Dispose()
-        {
-            UnHookEvents();
+            _fileSystemSerivce.StartScanAsync(e.ItsProjectInfo.ItsProjectPaths.ItsOutputPath);
         }
 
         private void UnHookEvents()
@@ -87,6 +146,9 @@ namespace AshokGelal.InstallBaker.Services
             _eventAggregator.BuildStarted.ItsEvent -=BuildStartedEventHandler;
             _eventAggregator.StartupProjectBuildStarted.ItsEvent -= StartupProjectBuildFinishedEventHandler;
             _fileSystemSerivce.ItsFileEntryAvailableEvent.ItsEvent -=FileSystemService_FileEntryAvailableEventHandler;
+            _fileSystemSerivce.ItsScanStatusChangedEvent.ItsEvent -= FileSystemService_ScanStatusChangedEventHandler;
         }
+
+        #endregion Private Methods
     }
 }

@@ -3,33 +3,176 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             Background="{DynamicResource VsBrush.Window}"
-             Foreground="{DynamicResource VsBrush.WindowText}"
+             xmlns:ViewModels="clr-namespace:AshokGelal.InstallBaker.ViewModels"
+             xmlns:Models="clr-namespace:CWEngine.Shared.FileSystemService.Models;assembly=CWEngine.Shared.FileSystemService"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="400" d:DesignWidth="400"
+             d:DataContext="{d:DesignInstance ViewModels:ToolWindowViewModel}"
              Name="MyToolWindow">
-    <Grid>
 
+    <UserControl.Resources>
+        <DataTemplate x:Key="_fileItemStyle" DataType="Models:FileEntry">
+            <Border BorderBrush="#990099FF" BorderThickness="0.8">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding DisplayTitle}" />
+                    <Button Grid.Column="1" Content=" + " />
+                    <Button Grid.Column="2" Content=" - " />
+                    <Button Grid.Column="3" Content=" x " />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid Margin="10 0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"  />
-            <RowDefinition Height="*"  />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ToolBar >
+        <ToolBar>
             <Button Content="Foo" />
         </ToolBar>
-<!--        <StackPanel Grid.Row="1" Orientation="Vertical">-->
-            <TabControl Grid.Row="1" VerticalAlignment="Stretch">
-                <TabItem Header="Updates">
-                    <Grid Background="#FFE5E5E5"/>
-                </TabItem>
-                <TabItem Header="Includes">
-                    <Grid Background="#FFE5E5E5"/>
-                </TabItem>
-                <TabItem Header="Excludes">
-                    <Grid Background="#FFE5E5E5"/>
-                </TabItem>
-            </TabControl>
-<!--            <Button Content="_Click Me!" Click="button1_Click" Width="120" Height="80" Name="button1" />-->
-<!--        </StackPanel>-->
+        <!--        <StackPanel Grid.Row="1" Orientation="Vertical">-->
+        <TabControl Grid.Row="1" VerticalAlignment="Stretch">
+            <TabItem Header="New">
+                <Grid>
+                    <ItemsControl
+                        ItemTemplate="{StaticResource _fileItemStyle}"
+                        ItemsSource="{Binding ItsNewFileList}">
+                    </ItemsControl>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Includes">
+                <Grid>
+                    <ItemsControl
+                        ItemTemplate="{StaticResource _fileItemStyle}"
+                        ItemsSource="{Binding ItsIncludedFileList}">
+                    </ItemsControl>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Excludes">
+                <Grid>
+                    <ItemsControl
+                        ItemTemplate="{StaticResource _fileItemStyle}"
+                        ItemsSource="{Binding ItsExcludedFileList}">
+                    </ItemsControl>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Bake Info">
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Margin" Value="5 5 0 5" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="FontSize" Value="13" />
+                        </Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Margin" Value="5 1 1 1" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="FontSize" Value="13" />
+                            <Setter Property="Padding" Value="5" />
+                        </Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Padding" Value="15 5" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label
+                      Grid.Column="0"
+                      Grid.Row="0"
+                      Content="Product Name: " />
+
+                    <TextBox
+                      x:Name="productName"
+                      Grid.Column="1"
+                      Grid.Row="0"
+                      HorizontalAlignment="Stretch"
+                      Text="{}{def val}" />
+
+                    <Label
+                      Grid.Column="0"
+                      Grid.Row="1"
+                      Content="Manufacturer" />
+
+                    <TextBox
+                      x:Name="manufacturer"
+                      Grid.Column="1"
+                      Grid.Row="1"
+                      HorizontalAlignment="Stretch"
+                      Text="{}{def val}" />
+
+                    <Label
+                      Grid.Column="0"
+                      Grid.Row="2"
+                      Content="Company: " />
+
+                    <TextBox
+                      x:Name="company"
+                      Grid.Column="1"
+                      Grid.Row="2"
+                      HorizontalAlignment="Stretch"
+                      Text="{}{def val}" />
+
+                    <Label
+                      Grid.Column="0"
+                      Grid.Row="3"
+                      Content="Icon" />
+
+                    <TextBox
+                      x:Name="icon"
+                      Grid.Column="1"
+                      Grid.Row="3"
+                      HorizontalAlignment="Stretch"
+                      Text="{}{def val}" />
+
+                    <Label
+                      Grid.Column="0"
+                      Grid.Row="4"
+                      Content="Executable Source:" />
+
+                    <DockPanel Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" LastChildFill="True">
+                        <Button Margin="0 1 1 1"
+                            Content="Browse ..." DockPanel.Dock="Right" />
+
+                        <TextBox x:Name="executableSource" 
+                                 Text="{}{def val}" />
+                    </DockPanel>
+
+                    <Label
+                      Grid.Column="0"
+                      Grid.Row="5"
+                      Content="Executable Display Name:" />
+
+                    <TextBox
+                      x:Name="executableDisplayName"
+                      Grid.Column="1"
+                      Grid.Row="5"
+                      Text="{}{def val}" />
+
+                    <Button Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" 
+                            Margin="10"
+                            HorizontalAlignment="Center" Content="Bake" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <!--            <Button Content="_Click Me!" Click="button1_Click" Width="120" Height="80" Name="button1" />-->
+        <!--        </StackPanel>-->
     </Grid>
 </UserControl>

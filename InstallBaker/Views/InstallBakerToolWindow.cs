@@ -1,7 +1,9 @@
 ﻿using System.Runtime.InteropServices;
+
 using AshokGelal.InstallBaker.Events;
 using AshokGelal.InstallBaker.Services;
 using AshokGelal.InstallBaker.ViewModels;
+
 using Microsoft.VisualStudio.Shell;
 
 namespace AshokGelal.InstallBaker.Views
@@ -18,11 +20,16 @@ namespace AshokGelal.InstallBaker.Views
     [Guid("e5116d85-19f6-4a60-8271-a6c83f73e49d")]
     internal class InstallBakerToolWindow : ToolWindowPane
     {
-        private InstallBakerEventAggregator _eventAggreagator;
-        private ToolWindowViewModel _toolWindowViewModel;
-        private DependenciesRegistry _dependenciesRegistry;
-        private BuildProgressService _buildProgressService;
+        #region Fields
+
         private InstallBakerPackage _basePackage;
+        private BuildProgressService _buildProgressService;
+        private DependenciesRegistry _dependenciesRegistry;
+        private InstallBakerEventAggregator _eventAggreagator;
+        private SolutionManagementService _solutionManagementService;
+        private ToolWindowViewModel _toolWindowViewModel;
+
+        #endregion Fields
 
         #region Constructors
 
@@ -32,16 +39,6 @@ namespace AshokGelal.InstallBaker.Views
         public InstallBakerToolWindow()
             : base(null)
         {
-            InitializeMembers();
-            // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
-            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
-            // the object returned by the Content property.
-            base.Content = new ToolWindowView();
-        }
-
-        private void InitializeMembers()
-        {
-
             // Set the window title reading it from the resources.
             Caption = Properties.Resources.ToolWindowTitle;
             // Set the image that will appear on the tab of the window frame
@@ -51,22 +48,43 @@ namespace AshokGelal.InstallBaker.Views
             // the strip being 16x16.
             BitmapResourceID = 301;
             BitmapIndex = 1;
+            // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
+            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
+            // the object returned by the Content property.
+            base.Content = new ToolWindowView();
+        }
 
+        #endregion Constructors
+
+        #region Protected Methods
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            _basePackage = (InstallBakerPackage)Package;
             _eventAggreagator = new InstallBakerEventAggregator();
             _dependenciesRegistry = new DependenciesRegistry(_eventAggreagator);
-            _basePackage = (InstallBakerPackage)Package;
             _buildProgressService = new BuildProgressService(_eventAggreagator, _basePackage.IDE.Events.BuildEvents, _basePackage.IDE.Solution);
+            _solutionManagementService = new SolutionManagementService(_eventAggreagator,
+                                                                       _basePackage.IDE.Events.SolutionEvents, _basePackage.IDE.Solution);
             _toolWindowViewModel = new ToolWindowViewModel(_eventAggreagator, _dependenciesRegistry);
+            ((ToolWindowView) Content).DataContext = _toolWindowViewModel;
         }
 
         protected override void OnClose()
         {
             _toolWindowViewModel.Dispose();
             _dependenciesRegistry.Dispose();
+            _buildProgressService.Dispose();
+            _solutionManagementService.Dispose();
             _eventAggreagator = null;
+            _toolWindowViewModel = null;
+            _dependenciesRegistry = null;
+            _buildProgressService = null;
+            _solutionManagementService = null;
             base.OnClose();
         }
 
-        #endregion Constructors
+        #endregion Protected Methods
     }
 }

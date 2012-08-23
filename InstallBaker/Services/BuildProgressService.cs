@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
 using AshokGelal.InstallBaker.Events;
+using AshokGelal.InstallBaker.Helpers;
 using AshokGelal.InstallBaker.Models;
+
 using EnvDTE;
 
 namespace AshokGelal.InstallBaker.Services
@@ -98,6 +101,7 @@ namespace AshokGelal.InstallBaker.Services
                     _eventAggregator.PublishEvent(_eventAggregator.StartupProjectBuildStarted, config);
                 else
                 {
+                    //TODO find a way to use a guid instead
                     var fileName = Path.GetFileName(project);
                     if (fileName != null &&
                         fileName.Equals(InstallerProjectName, StringComparison.CurrentCultureIgnoreCase))
@@ -111,15 +115,16 @@ namespace AshokGelal.InstallBaker.Services
         /// <summary>
         /// Event raised when the build of an individual project is done.
         /// </summary>
-        /// <param name="project">The project.</param>
+        /// <param name="projectName">The project name.</param>
         /// <param name="projectConfig">The project config.</param>
         /// <param name="platform">The platform.</param>
         /// <param name="solutionConfig">The solution config.</param>
         /// <param name="success">True if project build was successful, otherwise false.</param>
-        private void BuildEvents_OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
+        private void BuildEvents_OnBuildProjConfigDone(string projectName, string projectConfig, string platform, string solutionConfig, bool success)
         {
+            var project= Path.GetFileName(projectName);
             ProjectInfo projectInfo;
-            if (_availableProjectsDict.TryGetValue(project, out projectInfo))
+            if (project != null && _availableProjectsDict.TryGetValue(project, out projectInfo))
             {
                 var config = new BuildConfig(projectInfo, projectConfig, platform, solutionConfig) { ItsSuccessFlag = success };
 
@@ -148,20 +153,21 @@ namespace AshokGelal.InstallBaker.Services
         {
             try
             {
-                var mainProjectName = ((object[])(_currentSolution.SolutionBuild.StartupProjects))[0].ToString();
+                var mainProjectName =
+                    Path.GetFileName(((object[]) (_currentSolution.SolutionBuild.StartupProjects))[0].ToString());
                 _availableProjectsDict.Clear();
                 foreach (Project project in _currentSolution.Projects)
                 {
-                    var rootPath = Path.GetDirectoryName(project.FullName);
-                    if (rootPath == null)
-                        continue;
-
-                    var outputPath = project.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString();
-                    var outputFullPath = Path.Combine(rootPath, outputPath);
-
-                    var info = new ProjectInfo(project.Name, rootPath, outputFullPath);
-                    if (project.Name.Equals(mainProjectName, StringComparison.CurrentCultureIgnoreCase))
-                        _availableProjectsDict.Add(project.Name, info);
+                    var paths = Utilities.GetOutputPath(project);
+                    var projectName = Path.GetFileName(project.FullName);
+                    if (projectName != null)
+                    {
+                        var info = new ProjectInfo(project.Name, paths)
+                                       {
+                                           ItsStartupProjectFlag = projectName.Equals(mainProjectName, StringComparison.  CurrentCultureIgnoreCase)
+                                       };
+                        _availableProjectsDict.Add(projectName, info);
+                    }
                 }
             }
             catch (Exception e)
