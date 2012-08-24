@@ -121,8 +121,8 @@ namespace AshokGelal.InstallBaker.Services
                                            ItsManufacturer = "MetaGeek",
                                            ItsProductName = mainProjectFile,
                                            ItsUpgradeCode = Guid.NewGuid(),
-                                           ItsMainExecutableComponent = new BakeComponent("MainExecutable"),
-                                           ItsProgramMenuComponent = new BakeComponent("ProgramMenuDir"),
+                                           ItsMainExecutableComponent = new BakeComponent("MainExecutable", Guid.NewGuid()),
+                                           ItsProgramMenuComponent = new BakeComponent("ProgramMenuDir", Guid.NewGuid()),
                                            ItsSubDirectories = new List<BakeDirectory>()
                                        };
 

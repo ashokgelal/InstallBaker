@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 
@@ -44,9 +45,9 @@ namespace AshokGelal.InstallBaker.Services
 
         #region Public Methods
 
-        public static BakeMetadata ReadBakeFile(string bakeFile)
+        public static BakeMetadata ReadBakeFile(string bakeSrc)
         {
-            var xdoc = XDocument.Load(bakeFile);
+            var xdoc = XDocument.Load(bakeSrc);
             var metadata = new BakeMetadata();
 
             try
@@ -75,10 +76,41 @@ namespace AshokGelal.InstallBaker.Services
                 metadata.ItsAddBannerFlag = add_banner;
 
                 var executableCompElem = root.Element("executable_component");
-                metadata.ItsMainExecutableComponent = new BakeComponent(executableCompElem.Attribute("Id").Value, new Guid(executableCompElem.Attribute("Guid").Value));
+                var guid = new Guid(executableCompElem.Attribute("Guid").Value);
+                metadata.ItsMainExecutableComponent = new BakeComponent(executableCompElem.Attribute("Id").Value, guid);
 
-                executableCompElem = root.Element("program_menu_dir");
-                metadata.ItsProgramMenuComponent = new BakeComponent(executableCompElem.Attribute("Id").Value, new Guid(executableCompElem.Attribute("Guid").Value));
+                var programMenuElem = root.Element("program_menu_dir");
+                guid = new Guid(programMenuElem.Attribute("Guid").Value);
+                metadata.ItsProgramMenuComponent = new BakeComponent(programMenuElem.Attribute("Id").Value, guid);
+
+                // read subdirectories and files
+                var directories = root.Elements("Directory");
+
+                var list = new List<BakeDirectory>();
+                foreach (var directory in directories)
+                {
+                    var id = directory.Attribute("Id").Value;
+                    var name = directory.Attribute("Name").Value;
+                    var bakeDir = new BakeDirectory(id, name);
+
+                    var component = directory.Element("Component");
+                    id = component.Attribute("Id").Value;
+                    guid = new Guid(component.Attribute("Guid").Value);
+
+                    var bakeComp = new BakeComponent(id, guid);
+
+                    var files = component.Elements("File");
+                    foreach (var file in files)
+                    {
+                        id = file.Attribute("Id").Value;
+                        var src = file.Attribute("Source").Value;
+                        var bakeFile = new BakeFile(id, src, bakeComp);
+                        bakeComp.ItsBakeFiles.Add(bakeFile);
+                    }
+                    bakeDir.ItsComponent = bakeComp;
+                }
+
+                metadata.ItsSubDirectories = list;
 
                 // ReSharper restore PossibleNullReferenceException
                 return metadata;
@@ -109,18 +141,18 @@ namespace AshokGelal.InstallBaker.Services
         public static void WriteBakeFile(Stream vf, BakeMetadata data)
         {
             var xdoc = new XDocument();
-            var metadata = new XElement(xn + "metadata");
-            metadata.Add(new XElement(xn + "company_name", data.ItsCompanyName));
-            metadata.Add(new XElement(xn + "icon_name", data.ItsIconName));
-            metadata.Add(new XElement(xn + "executable_display_name", data.ItsMainExecutableDisplayName));
-            metadata.Add(new XElement(xn + "executable_source", data.ItsMainExecutableSource));
-            metadata.Add(new XElement(xn + "manufacturer", data.ItsManufacturer));
-            metadata.Add(new XElement(xn + "add_license", data.ItsAddLicenseFlag));
-            metadata.Add(new XElement(xn + "add_banner", data.ItsAddBannerFlag));
-            metadata.Add(new XElement(xn + "product_name", data.ItsProductName));
-            metadata.Add(new XElement(xn + "upgrade_code", data.ItsUpgradeCode.ToString()));
-            metadata.Add(new XElement(xn + "executable_component", new XAttribute("Id", data.ItsMainExecutableComponent.ItsId), new XAttribute("Guid", data.ItsMainExecutableComponent.ItsGuid.ToString())));
-            metadata.Add(new XElement(xn + "program_menu_dir", new XAttribute("Id", data.ItsProgramMenuComponent.ItsId), new XAttribute("Guid", data.ItsProgramMenuComponent.ItsGuid.ToString())));
+            var metadata = new XElement("metadata");
+            metadata.Add(new XElement("company_name", data.ItsCompanyName));
+            metadata.Add(new XElement("icon_name", data.ItsIconName));
+            metadata.Add(new XElement("executable_display_name", data.ItsMainExecutableDisplayName));
+            metadata.Add(new XElement("executable_source", data.ItsMainExecutableSource));
+            metadata.Add(new XElement("manufacturer", data.ItsManufacturer));
+            metadata.Add(new XElement("add_license", data.ItsAddLicenseFlag));
+            metadata.Add(new XElement("add_banner", data.ItsAddBannerFlag));
+            metadata.Add(new XElement("product_name", data.ItsProductName));
+            metadata.Add(new XElement("upgrade_code", data.ItsUpgradeCode.ToString()));
+            metadata.Add(new XElement("executable_component", new XAttribute("Id", data.ItsMainExecutableComponent.ItsId), new XAttribute("Guid", data.ItsMainExecutableComponent.ItsGuid.ToString())));
+            metadata.Add(new XElement("program_menu_dir", new XAttribute("Id", data.ItsProgramMenuComponent.ItsId), new XAttribute("Guid", data.ItsProgramMenuComponent.ItsGuid.ToString())));
             xdoc.Add(metadata);
             xdoc.Save(vf);
         }
@@ -131,7 +163,7 @@ namespace AshokGelal.InstallBaker.Services
             {
                 // ReSharper disable PossibleNullReferenceException
                 var xdoc = new XDocument();
-                var suffix = string.Format(VersionSuffix, metadata.ItsProductName);
+                var suffix = string.Format(VersionSuffix, Path.GetFileNameWithoutExtension(metadata.ItsMainExecutableDisplayName));
 
                 var wix = new XElement(xn + "Wix");
                 var product = new XElement(xn + "Product", new XAttribute("Id", "*"), new XAttribute("Name", metadata.ItsProductName),
@@ -291,7 +323,7 @@ namespace AshokGelal.InstallBaker.Services
                                          new XAttribute("Guid", metadata.ItsMainExecutableComponent.ItsGuid.ToString()));
             #region SHORTCUTS
 
-                var suffix = string.Format(VersionSuffix, metadata.ItsProductName);
+                var suffix = string.Format(VersionSuffix, Path.GetFileNameWithoutExtension(metadata.ItsMainExecutableDisplayName));
                 var shortcutFile = new XElement(xn + "File", new XAttribute("Id", suffix),
                                                 new XAttribute("Name", metadata.ItsMainExecutableDisplayName),
                                                 new XAttribute("DiskId", "1"), new XAttribute("KeyPath", "yes"),

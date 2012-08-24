@@ -47,11 +47,10 @@ namespace AshokGelal.InstallBaker.Models
 
         #region Constructors
 
-        public BakeComponent(string id, Guid guid = default(Guid))
+        public BakeComponent(string id, Guid guid)
         {
             ItsId = id;
-            if (guid == default(Guid))
-                ItsGuid = Guid.NewGuid();
+            ItsGuid = guid;
 
             ItsBakeFiles = new List<BakeFile>();
         }
