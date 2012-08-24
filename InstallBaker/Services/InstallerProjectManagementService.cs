@@ -17,6 +17,7 @@ namespace AshokGelal.InstallBaker.Services
         public static readonly string BakeOutputFileName = "bake.xml";
         public static readonly string WixOutputFileName = "Product.wxs";
         public static readonly string WixProjectGuid = "{930C7802-8A8C-48F9-8165-68863BCCD9DD}";
+        private BakeMetadata _bakeMetadata;
         private readonly Solution _currentSolution;
 
         #endregion Fields
@@ -83,10 +84,17 @@ namespace AshokGelal.InstallBaker.Services
 
         #region Private Methods
 
+        private void BakeMetaDataUpdatedEventHandler(object sender, EventArgs e)
+        {
+            XmlFileParserService.UpdateBakeFile(_bakeMetadata, ItsBakeFile);
+            XmlFileParserService.WriteWixFile(_bakeMetadata, ItsWixFile);
+        }
+
         private void HookEvents()
         {
             _solutionEvents.ProjectAdded += SolutionEvents_ProjectAdded;
             _solutionEvents.Opened += SolutionEvents_SolutionOpened;
+            _eventAggregator.BakeMetaDataUpdated.ItsEvent += BakeMetaDataUpdatedEventHandler;
         }
 
         private void InitializeBakeFile(Project project)
@@ -125,9 +133,9 @@ namespace AshokGelal.InstallBaker.Services
                 metadata = XmlFileParserService.ReadBakeFile(ItsBakeFile);
             }
 
-            _eventAggregator.BakeMetadataAvailable.Raise(this, metadata);
-
+            _bakeMetadata = metadata;
             XmlFileParserService.WriteWixFile(metadata, ItsWixFile);
+            _eventAggregator.BakeMetadataAvailable.Raise(this, metadata);
         }
 
         private void LoadInstallerProject()
@@ -157,6 +165,8 @@ namespace AshokGelal.InstallBaker.Services
         private void UnHookEvents()
         {
             _solutionEvents.ProjectAdded -= SolutionEvents_ProjectAdded;
+            _solutionEvents.Opened -= SolutionEvents_SolutionOpened;
+            _eventAggregator.BakeMetaDataUpdated.ItsEvent -= BakeMetaDataUpdatedEventHandler;
         }
 
         #endregion Private Methods

@@ -62,124 +62,90 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Bake Info">
-                <Grid DataContext="{Binding ItsBakeMetaData}">
-                    <Grid.Resources>
+                <TabItem.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="Margin" Value="5 5 0 5" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="FontSize" Value="13" />
+                    </Style>
 
-                        <Style TargetType="Label">
-                            <Setter Property="Margin" Value="5 5 0 5" />
-                            <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="FontSize" Value="13" />
-                        </Style>
+                    <Style TargetType="CheckBox">
+                        <Setter Property="Margin" Value="5 5 0 5" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="FontSize" Value="13" />
+                    </Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Margin" Value="5 1 1 1" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="Padding" Value="5" />
+                    </Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Padding" Value="15 5" />
+                    </Style>
+                </TabItem.Resources>
 
-                        <Style TargetType="CheckBox">
-                            <Setter Property="Margin" Value="5 5 0 5" />
-                            <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="FontSize" Value="13" />
-                        </Style>
-                        <Style TargetType="TextBox">
-                            <Setter Property="Margin" Value="5 1 1 1" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                            <Setter Property="FontSize" Value="13" />
-                            <Setter Property="Padding" Value="5" />
-                        </Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Padding" Value="15 5" />
-                        </Style>
-                    </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <StackPanel>
 
-                    <Label
-                      Grid.Column="0"
-                      Grid.Row="0"
-                      Content="Product Name: " />
+                    <Grid DataContext="{Binding ItsBakeMetaData}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <TextBox
-                      x:Name="productName"
-                      Grid.Column="1"
-                      Grid.Row="0"
-                      HorizontalAlignment="Stretch"
-                      Text="{Binding ItsProductName}" />
+                        <Label Grid.Column="0" Grid.Row="0" Content="Product Name: " />
 
-                    <Label
-                      Grid.Column="0"
-                      Grid.Row="1"
-                      Content="Manufacturer" />
+                        <TextBox x:Name="productName" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" 
+                                 Text="{Binding ItsProductName}" />
 
-                    <TextBox
-                      x:Name="manufacturer"
-                      Grid.Column="1"
-                      Grid.Row="1"
-                      HorizontalAlignment="Stretch"
-                      Text="{Binding ItsManufacturer}" />
+                        <Label Grid.Column="0" Grid.Row="1" Content="Manufacturer" />
 
-                    <Label
-                      Grid.Column="0"
-                      Grid.Row="2"
-                      Content="Company: " />
+                        <TextBox x:Name="manufacturer" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" 
+                                 Text="{Binding ItsManufacturer}" />
 
-                    <TextBox
-                      x:Name="company"
-                      Grid.Column="1"
-                      Grid.Row="2"
-                      HorizontalAlignment="Stretch"
-                      Text="{Binding ItsCompanyName}" />
+                        <Label Grid.Column="0" Grid.Row="2" Content="Company: " />
 
-                    <Label
-                      Grid.Column="0"
-                      Grid.Row="3"
-                      Content="Icon" />
+                        <TextBox x:Name="company" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" 
+                                 Text="{Binding ItsCompanyName}" />
 
-                    <TextBox
-                      x:Name="icon"
-                      Grid.Column="1"
-                      Grid.Row="3"
-                      HorizontalAlignment="Stretch"
-                      Text="{Binding ItsIconName}" />
+                        <Label Grid.Column="0" Grid.Row="3" Content="Icon" />
 
-                    <Label
-                      Grid.Column="0"
-                      Grid.Row="4"
-                      Content="Executable Source:" />
+                        <TextBox x:Name="icon" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" 
+                                 Text="{Binding ItsIconName}" />
 
-                    <DockPanel Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" LastChildFill="True">
-                        <Button Margin="0 1 1 1" Visibility="Collapsed"
-                            Content="Browse ..." DockPanel.Dock="Right" />
+                        <Label Grid.Column="0" Grid.Row="4" Content="Executable Source:" />
 
-                        <TextBox x:Name="executableSource" 
-                                 Text="{Binding ItsMainExecutableSource}" />
-                    </DockPanel>
+                        <DockPanel Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" LastChildFill="True">
+                            <Button Margin="0 1 1 1" Visibility="Collapsed" Content="Browse ..." DockPanel.Dock="Right" />
 
-                    <Label
-                      Grid.Column="0"
-                      Grid.Row="5"
-                      Content="Executable Display Name:" />
+                            <TextBox x:Name="executableSource" 
+                                     Text="{Binding ItsMainExecutableSource}" />
+                        </DockPanel>
 
-                    <TextBox
-                      x:Name="executableDisplayName"
-                      Grid.Column="1"
-                      Grid.Row="5"
-                      Text="{Binding ItsMainExecutableDisplayName}" />
+                        <Label Grid.Column="0" Grid.Row="5" Content="Executable Display Name:" />
+                        <TextBox x:Name="executableDisplayName" Grid.Column="1" Grid.Row="5" 
+                                 Text="{Binding ItsMainExecutableDisplayName}" />
 
-                    <CheckBox Grid.Column="0" Grid.Row="6" Content="Add License" />
-                    <CheckBox Grid.Column="1" Grid.Row="6" Content="Add Bitmap" />
+                        <CheckBox Grid.Column="0" Grid.Row="6" Content="Add License" 
+                                  IsChecked="{Binding ItsAddLicenseFlag}" />
 
-                    <Button Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" 
-                            Margin="10"
-                            HorizontalAlignment="Center" Content="Update" />
-                </Grid>
+                        <CheckBox Grid.Column="1" Grid.Row="6" Content="Add Bitmap"
+                              IsChecked="{Binding ItsAddBannerFlag}"/>
+
+                    </Grid>
+                    <Button Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" Margin="10" 
+                            HorizontalAlignment="Center" Content="Update" 
+                            Command="{Binding ItsUpdateMetadataCommand}" />
+                </StackPanel>
             </TabItem>
         </TabControl>
     </Grid>

@@ -11,6 +11,7 @@ namespace AshokGelal.InstallBaker.Events
         #region Fields
 
         public readonly SingleArgsEventHandler<BakeMetadata> BakeMetadataAvailable = new SingleArgsEventHandler<BakeMetadata>();
+        public readonly EmptyArgsEventHandler BakeMetaDataUpdated = new EmptyArgsEventHandler();
 
         // Build Related Events
         public readonly EmptyArgsEventHandler BuildFinished = new EmptyArgsEventHandler();

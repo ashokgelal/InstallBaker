@@ -7,9 +7,11 @@ using AshokGelal.InstallBaker.Services;
 
 using CWEngine.Shared.FileSystemService.Models;
 
+using DietMvvm;
+
 namespace AshokGelal.InstallBaker.ViewModels
 {
-    internal class ToolWindowViewModel : DietMvvm.ViewModelBase, IDisposable
+    internal class ToolWindowViewModel : ViewModelBase, IDisposable
     {
         #region Fields
 
@@ -19,6 +21,7 @@ namespace AshokGelal.InstallBaker.ViewModels
         private ObservableCollection<FileEntry> _excludedFileList;
         private ObservableCollection<FileEntry> _includedFileList;
         private ObservableCollection<FileEntry> _newFileList;
+        private ViewModelCommand _updateMetadataCommand;
 
         #endregion Fields
 
@@ -64,6 +67,16 @@ namespace AshokGelal.InstallBaker.ViewModels
             }
         }
 
+        public ViewModelCommand ItsUpdateMetadataCommand
+        {
+            get { return _updateMetadataCommand; }
+            set
+            {
+                _updateMetadataCommand = value;
+                NotifyPropertyChanged(()=>ItsUpdateMetadataCommand);
+            }
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -72,6 +85,7 @@ namespace AshokGelal.InstallBaker.ViewModels
         {
             _eventAggregator = eventAggregator;
             _dependenciesRegistry = dependenciesRegistry;
+            ItsUpdateMetadataCommand = new ViewModelCommand(UpdateMetadataCommandHandler, CanUpdateMetadata);
             HookEvents();
         }
 
@@ -97,6 +111,11 @@ namespace AshokGelal.InstallBaker.ViewModels
         {
         }
 
+        private bool CanUpdateMetadata()
+        {
+            return true;
+        }
+
         private void DependenciesRegistry_DependenciesRegistryUpdateEventHandler(object sender, EventArgs e)
         {
             ItsNewFileList = new ObservableCollection<FileEntry>(_dependenciesRegistry.ItsNewFileEntries);
@@ -114,6 +133,11 @@ namespace AshokGelal.InstallBaker.ViewModels
         private void UnHookEvents()
         {
             _eventAggregator.BuildFinished.ItsEvent -= BuildFinishedEventHandler;
+        }
+
+        private void UpdateMetadataCommandHandler()
+        {
+            _eventAggregator.BakeMetaDataUpdated.Raise(this);
         }
 
         #endregion Private Methods

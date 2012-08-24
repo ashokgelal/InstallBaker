@@ -60,6 +60,8 @@ namespace AshokGelal.InstallBaker.Services
                 var manufacturer = root.Element("manufacturer").Value;
                 var product_name = root.Element("product_name").Value;
                 var upgrade_code = root.Element("upgrade_code").Value;
+                var add_license = Convert.ToBoolean(root.Element("add_license").Value);
+                var add_bitmap = Convert.ToBoolean(root.Element("add_bitmap").Value);
 
                 metadata.ItsCompanyName = company_name;
                 metadata.ItsIconName = icon_name;
@@ -68,6 +70,8 @@ namespace AshokGelal.InstallBaker.Services
                 metadata.ItsManufacturer = manufacturer;
                 metadata.ItsProductName = product_name;
                 metadata.ItsUpgradeCode = new Guid(upgrade_code);
+                metadata.ItsAddLicenseFlag = add_license;
+                metadata.ItsAddBannerFlag = add_bitmap;
 
                 var executableCompElem = root.Element("executable_component");
                 metadata.ItsMainExecutableComponent = new BakeComponent(executableCompElem.Attribute("Id").Value, new Guid(executableCompElem.Attribute("Guid").Value));
@@ -84,6 +88,23 @@ namespace AshokGelal.InstallBaker.Services
             }
         }
 
+        public static void UpdateBakeFile(BakeMetadata data, string path)
+        {
+            // ReSharper disable PossibleNullReferenceException
+            var root = XElement.Load(path);
+            //            var root = xdoc.Element("metadata");
+            root.SetElementValue("company_name", data.ItsCompanyName);
+            root.SetElementValue("icon_name", data.ItsIconName);
+            root.SetElementValue("executable_display_name", data.ItsMainExecutableDisplayName);
+            root.SetElementValue("executable_source", data.ItsMainExecutableSource);
+            root.SetElementValue("manufacturer", data.ItsManufacturer);
+            root.SetElementValue("add_license", data.ItsAddLicenseFlag);
+            root.SetElementValue("add_bitmap", data.ItsAddBannerFlag);
+            root.SetElementValue("product_name", data.ItsProductName);
+            root.Save(path);
+            // ReSharper restore PossibleNullReferenceException
+        }
+
         public static void WriteBakeFile(Stream vf, BakeMetadata data)
         {
             var xdoc = new XDocument();
@@ -93,8 +114,8 @@ namespace AshokGelal.InstallBaker.Services
             metadata.Add(new XElement(xn + "executable_display_name", data.ItsMainExecutableDisplayName));
             metadata.Add(new XElement(xn + "executable_source", data.ItsMainExecutableSource));
             metadata.Add(new XElement(xn + "manufacturer", data.ItsManufacturer));
-            metadata.Add(new XElement(xn + "addLicense", data.ItsAddLicenseFlag));
-            metadata.Add(new XElement(xn + "addBanner", data.ItsAddBannerFlag));
+            metadata.Add(new XElement(xn + "add_license", data.ItsAddLicenseFlag));
+            metadata.Add(new XElement(xn + "add_bitmap", data.ItsAddBannerFlag));
             metadata.Add(new XElement(xn + "product_name", data.ItsProductName));
             metadata.Add(new XElement(xn + "upgrade_code", data.ItsUpgradeCode.ToString()));
             metadata.Add(new XElement(xn + "executable_component", new XAttribute("Id", data.ItsMainExecutableComponent.ItsId), new XAttribute("Guid", data.ItsMainExecutableComponent.ItsGuid.ToString())));
