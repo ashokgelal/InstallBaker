@@ -115,7 +115,7 @@ namespace AshokGelal.InstallBaker.Services
                                    {
                                            ItsCompanyName = "MetaGeek, LLC",
                                            ItsIconName = "icon.ico",
-                                           ItsMainExecutableDisplayName = mainProjectFile,
+                                           ItsMainExecutableDisplayName = string.Format("{0}.exe", mainProjectFile),
                                            ItsMainExecutableSource = string.Format("{0}.exe", mainProjectFile),
                                            ItsManufacturer = "MetaGeek",
                                            ItsProductName = "inSSIDer 3",
