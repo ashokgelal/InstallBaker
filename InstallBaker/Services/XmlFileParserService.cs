@@ -36,7 +36,8 @@ namespace AshokGelal.InstallBaker.Services
           </UI>
         </InstallUiXml>";
         public static readonly string RegistryKeyFormat = @"Software\[Manufacturer]\[ProductName]\{{0}}";
-        public static readonly string VersionFormat = "!{bind.FileVersion.{0}";
+        public static readonly string VersionFormat = "!(bind.FileVersion.{0})";
+        public static readonly string VersionSuffix = "{0}_EXE";
         private static XNamespace xn = "http://schemas.microsoft.com/wix/2006/wi";
 
         #endregion Fields
@@ -61,7 +62,7 @@ namespace AshokGelal.InstallBaker.Services
                 var product_name = root.Element("product_name").Value;
                 var upgrade_code = root.Element("upgrade_code").Value;
                 var add_license = Convert.ToBoolean(root.Element("add_license").Value);
-                var add_bitmap = Convert.ToBoolean(root.Element("add_bitmap").Value);
+                var add_banner = Convert.ToBoolean(root.Element("add_banner").Value);
 
                 metadata.ItsCompanyName = company_name;
                 metadata.ItsIconName = icon_name;
@@ -71,7 +72,7 @@ namespace AshokGelal.InstallBaker.Services
                 metadata.ItsProductName = product_name;
                 metadata.ItsUpgradeCode = new Guid(upgrade_code);
                 metadata.ItsAddLicenseFlag = add_license;
-                metadata.ItsAddBannerFlag = add_bitmap;
+                metadata.ItsAddBannerFlag = add_banner;
 
                 var executableCompElem = root.Element("executable_component");
                 metadata.ItsMainExecutableComponent = new BakeComponent(executableCompElem.Attribute("Id").Value, new Guid(executableCompElem.Attribute("Guid").Value));
@@ -99,7 +100,7 @@ namespace AshokGelal.InstallBaker.Services
             root.SetElementValue("executable_source", data.ItsMainExecutableSource);
             root.SetElementValue("manufacturer", data.ItsManufacturer);
             root.SetElementValue("add_license", data.ItsAddLicenseFlag);
-            root.SetElementValue("add_bitmap", data.ItsAddBannerFlag);
+            root.SetElementValue("add_banner", data.ItsAddBannerFlag);
             root.SetElementValue("product_name", data.ItsProductName);
             root.Save(path);
             // ReSharper restore PossibleNullReferenceException
@@ -115,7 +116,7 @@ namespace AshokGelal.InstallBaker.Services
             metadata.Add(new XElement(xn + "executable_source", data.ItsMainExecutableSource));
             metadata.Add(new XElement(xn + "manufacturer", data.ItsManufacturer));
             metadata.Add(new XElement(xn + "add_license", data.ItsAddLicenseFlag));
-            metadata.Add(new XElement(xn + "add_bitmap", data.ItsAddBannerFlag));
+            metadata.Add(new XElement(xn + "add_banner", data.ItsAddBannerFlag));
             metadata.Add(new XElement(xn + "product_name", data.ItsProductName));
             metadata.Add(new XElement(xn + "upgrade_code", data.ItsUpgradeCode.ToString()));
             metadata.Add(new XElement(xn + "executable_component", new XAttribute("Id", data.ItsMainExecutableComponent.ItsId), new XAttribute("Guid", data.ItsMainExecutableComponent.ItsGuid.ToString())));
@@ -130,10 +131,11 @@ namespace AshokGelal.InstallBaker.Services
             {
                 // ReSharper disable PossibleNullReferenceException
                 var xdoc = new XDocument();
+                var suffix = string.Format(VersionSuffix, metadata.ItsProductName);
 
                 var wix = new XElement(xn + "Wix");
                 var product = new XElement(xn + "Product", new XAttribute("Id", "*"), new XAttribute("Name", metadata.ItsProductName),
-                                           new XAttribute("Language", "1033"), new XAttribute("Version", "!(bind.FileVersion.inSSIDer_EXE)"),
+                                           new XAttribute("Language", "1033"), new XAttribute("Version", string.Format(VersionFormat, suffix)),
                                            new XAttribute("Manufacturer", metadata.ItsManufacturer),
                                            new XAttribute("UpgradeCode", metadata.ItsUpgradeCode.ToString())
                     );
@@ -289,7 +291,8 @@ namespace AshokGelal.InstallBaker.Services
                                          new XAttribute("Guid", metadata.ItsMainExecutableComponent.ItsGuid.ToString()));
             #region SHORTCUTS
 
-                var shortcutFile = new XElement(xn + "File", new XAttribute("Id", "inSSIDer_EXE"),
+                var suffix = string.Format(VersionSuffix, metadata.ItsProductName);
+                var shortcutFile = new XElement(xn + "File", new XAttribute("Id", suffix),
                                                 new XAttribute("Name", metadata.ItsMainExecutableDisplayName),
                                                 new XAttribute("DiskId", "1"), new XAttribute("KeyPath", "yes"),
                                                 new XAttribute("Source", metadata.ItsMainExecutableSource));

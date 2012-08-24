@@ -15,6 +15,7 @@ namespace AshokGelal.InstallBaker.Services
         #region Fields
 
         public static readonly string BakeOutputFileName = "bake.xml";
+        public static readonly string InitialOutputFile = "../{0}/bin/Debug/{0}.exe";
         public static readonly string WixOutputFileName = "Product.wxs";
         public static readonly string WixProjectGuid = "{930C7802-8A8C-48F9-8165-68863BCCD9DD}";
         private BakeMetadata _bakeMetadata;
@@ -116,9 +117,9 @@ namespace AshokGelal.InstallBaker.Services
                                            ItsCompanyName = "MetaGeek, LLC",
                                            ItsIconName = "icon.ico",
                                            ItsMainExecutableDisplayName = string.Format("{0}.exe", mainProjectFile),
-                                           ItsMainExecutableSource = string.Format("{0}.exe", mainProjectFile),
+                                           ItsMainExecutableSource = string.Format(InitialOutputFile, mainProjectFile),
                                            ItsManufacturer = "MetaGeek",
-                                           ItsProductName = "inSSIDer 3",
+                                           ItsProductName = mainProjectFile,
                                            ItsUpgradeCode = Guid.NewGuid(),
                                            ItsMainExecutableComponent = new BakeComponent("MainExecutable"),
                                            ItsProgramMenuComponent = new BakeComponent("ProgramMenuDir"),
