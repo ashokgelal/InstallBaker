@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using AshokGelal.InstallBaker.Events;
 using AshokGelal.InstallBaker.Models;
@@ -106,6 +107,24 @@ namespace AshokGelal.InstallBaker.Services
         private void BakeMetadataAvailableEventHandler(object sender, SingleEventArgs<BakeMetadata> e)
         {
             _bakeMetadata = e.ItsValue;
+            if (_bakeMetadata == null)
+                return;
+
+            var comp = _bakeMetadata.ItsMainExecutableComponent;
+            foreach (var file in comp.ItsBakeFiles)
+            {
+                var p1 = ItsInstallerProjectManagementService.ItsInstallerProjectInfo.ItsProjectPaths.ItsRootPath;
+                var fileinfo = new FileInfo(Path.Combine(p1, file.ItsSource));
+
+                var fileEntry = new FileEntry
+                                    {
+                                        DisplayTitle = Path.GetFileName(file.ItsSource),
+                                        FullPath = file.ItsSource,
+                                        SizeInfo = new StorageSizeInfo(fileinfo.Length)
+                                    };
+                ItsIncludedFileEntriesDict.Add(fileEntry.GetHashCode(), fileEntry);
+            }
+            RaiseRegistryUpdateEvent();
         }
 
         private void BuildStartedEventHandler(object sender, SingleEventArgs<List<ProjectInfo>> e)
@@ -181,7 +200,7 @@ namespace AshokGelal.InstallBaker.Services
 
         private void StartupProjectBuildFinishedEventHandler(object sender, BuildConfig e)
         {
-            _fileSystemSerivce.StartScanAsync(e.ItsProjectInfo.ItsProjectPaths.ItsOutputPath);
+            _fileSystemSerivce.StartScanAsync(e.ItsProjectInfo.ItsProjectPaths.ItsOutputPath, true, ItsInstallerProjectManagementService.ItsWixFile);
         }
 
         private void UnHookEvents()

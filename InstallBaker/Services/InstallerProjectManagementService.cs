@@ -6,6 +6,8 @@ using AshokGelal.InstallBaker.Events;
 using AshokGelal.InstallBaker.Helpers;
 using AshokGelal.InstallBaker.Models;
 
+using CWEngine.Shared.FileSystemService.Helpers;
+
 using EnvDTE;
 
 namespace AshokGelal.InstallBaker.Services
@@ -87,15 +89,13 @@ namespace AshokGelal.InstallBaker.Services
 
         public void AddNewFile(string fullPath)
         {
-            var relativePath = fullPath.GetRelativePath(ItsWixFile);
-            _bakeMetadata.ItsMainExecutableComponent.ItsBakeFiles.Add(new BakeFile(string.Format("FI_{0}", Path.GetFileNameWithoutExtension(relativePath)), relativePath, _bakeMetadata.ItsMainExecutableComponent));
+            _bakeMetadata.ItsMainExecutableComponent.ItsBakeFiles.Add(new BakeFile(string.Format("FI_{0}", Path.GetFileNameWithoutExtension(fullPath)), fullPath, _bakeMetadata.ItsMainExecutableComponent));
             UpdateBakeFile();
         }
 
         public void RemoveFile(string fullPath)
         {
-            var relativePath = fullPath.GetRelativePath(ItsWixFile);
-            _bakeMetadata.ItsMainExecutableComponent.ItsBakeFiles.RemoveAll(e => e.ItsSource.Equals(relativePath));
+            _bakeMetadata.ItsMainExecutableComponent.ItsBakeFiles.RemoveAll(e => e.ItsSource.Equals(fullPath));
             UpdateBakeFile();
         }
 

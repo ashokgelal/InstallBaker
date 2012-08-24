@@ -5,22 +5,6 @@ using EnvDTE;
 
 namespace AshokGelal.InstallBaker.Helpers
 {
-    public static class PathExtensions
-    {
-        #region Public Methods
-
-        public static string GetRelativePath(this string from, string to)
-        {
-            var uri1 = new Uri(from);
-            var uri2 = new Uri(to);
-
-            var relativeUri = uri2.MakeRelativeUri(uri1);
-            return relativeUri.ToString();
-        }
-
-        #endregion Public Methods
-    }
-
     public class ProjectPaths
     {
         #region Properties
