@@ -33,10 +33,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ToolBar>
+        <ToolBar Visibility="Collapsed">
             <Button Content="Foo" />
         </ToolBar>
-        <!--        <StackPanel Grid.Row="1" Orientation="Vertical">-->
         <TabControl Grid.Row="1" VerticalAlignment="Stretch">
             <TabItem Header="New">
                 <Grid>
@@ -63,7 +62,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Bake Info">
-                <Grid>
+                <Grid DataContext="{Binding ItsBakeMetaData}">
                     <Grid.Resources>
                         <Style TargetType="Label">
                             <Setter Property="Margin" Value="5 5 0 5" />
@@ -104,7 +103,7 @@
                       Grid.Column="1"
                       Grid.Row="0"
                       HorizontalAlignment="Stretch"
-                      Text="{}{def val}" />
+                      Text="{Binding ItsProductName}" />
 
                     <Label
                       Grid.Column="0"
@@ -116,7 +115,7 @@
                       Grid.Column="1"
                       Grid.Row="1"
                       HorizontalAlignment="Stretch"
-                      Text="{}{def val}" />
+                      Text="{Binding ItsManufacturer}" />
 
                     <Label
                       Grid.Column="0"
@@ -128,7 +127,7 @@
                       Grid.Column="1"
                       Grid.Row="2"
                       HorizontalAlignment="Stretch"
-                      Text="{}{def val}" />
+                      Text="{Binding ItsCompanyName}" />
 
                     <Label
                       Grid.Column="0"
@@ -140,7 +139,7 @@
                       Grid.Column="1"
                       Grid.Row="3"
                       HorizontalAlignment="Stretch"
-                      Text="{}{def val}" />
+                      Text="{Binding ItsIconName}" />
 
                     <Label
                       Grid.Column="0"
@@ -152,7 +151,7 @@
                             Content="Browse ..." DockPanel.Dock="Right" />
 
                         <TextBox x:Name="executableSource" 
-                                 Text="{}{def val}" />
+                                 Text="{Binding ItsMainExecutableSource}" />
                     </DockPanel>
 
                     <Label
@@ -164,15 +163,13 @@
                       x:Name="executableDisplayName"
                       Grid.Column="1"
                       Grid.Row="5"
-                      Text="{}{def val}" />
+                      Text="{Binding ItsMainExecutableDisplayName}" />
 
                     <Button Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" 
                             Margin="10"
-                            HorizontalAlignment="Center" Content="Bake" />
+                            HorizontalAlignment="Center" Content="Update" />
                 </Grid>
             </TabItem>
         </TabControl>
-        <!--            <Button Content="_Click Me!" Click="button1_Click" Width="120" Height="80" Name="button1" />-->
-        <!--        </StackPanel>-->
     </Grid>
 </UserControl>

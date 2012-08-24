@@ -26,7 +26,7 @@ namespace AshokGelal.InstallBaker.Views
         private BuildProgressService _buildProgressService;
         private DependenciesRegistry _dependenciesRegistry;
         private InstallBakerEventAggregator _eventAggreagator;
-        private SolutionManagementService _solutionManagementService;
+        private InstallerProjectManagementService _installerProjectManagementService;
         private ToolWindowViewModel _toolWindowViewModel;
 
         #endregion Fields
@@ -65,7 +65,7 @@ namespace AshokGelal.InstallBaker.Views
             _eventAggreagator = new InstallBakerEventAggregator();
             _dependenciesRegistry = new DependenciesRegistry(_eventAggreagator);
             _buildProgressService = new BuildProgressService(_eventAggreagator, _basePackage.IDE.Events.BuildEvents, _basePackage.IDE.Solution);
-            _solutionManagementService = new SolutionManagementService(_eventAggreagator,
+            _installerProjectManagementService = new InstallerProjectManagementService(_eventAggreagator,
                                                                        _basePackage.IDE.Events.SolutionEvents, _basePackage.IDE.Solution);
             _toolWindowViewModel = new ToolWindowViewModel(_eventAggreagator, _dependenciesRegistry);
             ((ToolWindowView) Content).DataContext = _toolWindowViewModel;
@@ -76,12 +76,12 @@ namespace AshokGelal.InstallBaker.Views
             _toolWindowViewModel.Dispose();
             _dependenciesRegistry.Dispose();
             _buildProgressService.Dispose();
-            _solutionManagementService.Dispose();
+            _installerProjectManagementService.Dispose();
             _eventAggreagator = null;
             _toolWindowViewModel = null;
             _dependenciesRegistry = null;
             _buildProgressService = null;
-            _solutionManagementService = null;
+            _installerProjectManagementService = null;
             base.OnClose();
         }
 

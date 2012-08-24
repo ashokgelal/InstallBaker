@@ -24,6 +24,16 @@ namespace AshokGelal.InstallBaker.ViewModels
 
         #region Properties
 
+        public BakeMetadata ItsBakeMetaData
+        {
+            get { return _bakeMetaData; }
+            private set
+            {
+                _bakeMetaData = value;
+                NotifyPropertyChanged(()=>ItsBakeMetaData);
+            }
+        }
+
         public ObservableCollection<FileEntry> ItsExcludedFileList
         {
             get { return _excludedFileList; }
@@ -78,6 +88,11 @@ namespace AshokGelal.InstallBaker.ViewModels
 
         #region Private Methods
 
+        private void BakeMetadataAvailableEventHandler(object sender, DietMvvm.Events.SingleEventArgs<BakeMetadata> e)
+        {
+            ItsBakeMetaData = e.ItsValue;
+        }
+
         private void BuildFinishedEventHandler(object sender, EventArgs e)
         {
         }
@@ -92,6 +107,7 @@ namespace AshokGelal.InstallBaker.ViewModels
         private void HookEvents()
         {
             _eventAggregator.BuildFinished.ItsEvent += BuildFinishedEventHandler;
+            _eventAggregator.BakeMetadataAvailable.ItsEvent += BakeMetadataAvailableEventHandler;
             _dependenciesRegistry.DependenciesRegistryUpdateEvent.ItsEvent += DependenciesRegistry_DependenciesRegistryUpdateEventHandler;
         }
 

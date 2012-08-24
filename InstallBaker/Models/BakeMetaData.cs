@@ -71,7 +71,7 @@ namespace AshokGelal.InstallBaker.Models
     {
         #region Properties
 
-        public List<BakeComponent> ItsComponents
+        public BakeComponent ItsComponent
         {
             get;
             set;
@@ -97,7 +97,6 @@ namespace AshokGelal.InstallBaker.Models
         {
             ItsId = id;
             ItsName = name;
-            ItsComponents = new List<BakeComponent>();
         }
 
         #endregion Constructors
@@ -180,7 +179,6 @@ namespace AshokGelal.InstallBaker.Models
             }
         }
 
-        //[Browsable(false)]
         public BakeComponent ItsMainExecutableComponent
         {
             get;
@@ -227,14 +225,17 @@ namespace AshokGelal.InstallBaker.Models
             }
         }
 
-        //[Browsable(false)]
         public BakeComponent ItsProgramMenuComponent
         {
             get;
             set;
         }
 
-        //[Browsable(false)]
+        public List<BakeDirectory> ItsSubDirectories
+        {
+            get; set;
+        }
+
         public Guid ItsUpgradeCode
         {
             get;

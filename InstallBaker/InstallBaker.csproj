@@ -131,7 +131,8 @@
     <Compile Include="Events\InstallBakerEventAggregator.cs" />
     <Compile Include="Models\ProjectInfo.cs" />
     <Compile Include="Services\DependenciesRegistry.cs" />
-    <Compile Include="Services\SolutionManagementService.cs" />
+    <Compile Include="Services\InstallerProjectManagementService.cs" />
+    <Compile Include="Services\XmlFileParserService.cs" />
     <Compile Include="ViewModels\ToolWindowViewModel.cs" />
     <Compile Include="Views\ToolWindowView.xaml.cs">
       <DependentUpon>ToolWindowView.xaml</DependentUpon>
