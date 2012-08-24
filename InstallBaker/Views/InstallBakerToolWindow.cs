@@ -69,6 +69,8 @@ namespace AshokGelal.InstallBaker.Views
 
             _installerProjectManagementService = new InstallerProjectManagementService(_eventAggreagator,
                                                                        _basePackage.IDE.Events.SolutionEvents, _basePackage.IDE.Solution);
+            // TODO Find a better way
+            _dependenciesRegistry.ItsInstallerProjectManagementService = _installerProjectManagementService;
             _buildProgressService = new BuildProgressService(_eventAggreagator, _basePackage.IDE.Events.BuildEvents, _basePackage.IDE.Solution);
         }
 

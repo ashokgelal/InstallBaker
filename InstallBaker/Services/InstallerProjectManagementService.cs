@@ -83,6 +83,30 @@ namespace AshokGelal.InstallBaker.Services
 
         #endregion Dispose
 
+        #region Public Methods
+
+        public void AddNewFile(string fullPath)
+        {
+            var relativePath = fullPath.GetRelativePath(ItsWixFile);
+            _bakeMetadata.ItsMainExecutableComponent.ItsBakeFiles.Add(new BakeFile(string.Format("FI_{0}", Path.GetFileNameWithoutExtension(relativePath)), relativePath, _bakeMetadata.ItsMainExecutableComponent));
+            UpdateBakeFile();
+        }
+
+        public void RemoveFile(string fullPath)
+        {
+            var relativePath = fullPath.GetRelativePath(ItsWixFile);
+            _bakeMetadata.ItsMainExecutableComponent.ItsBakeFiles.RemoveAll(e => e.ItsSource.Equals(relativePath));
+            UpdateBakeFile();
+        }
+
+        public void UpdateBakeFile()
+        {
+            XmlFileParserService.UpdateBakeFile(_bakeMetadata, ItsBakeFile);
+            XmlFileParserService.WriteWixFile(_bakeMetadata, ItsWixFile);
+        }
+
+        #endregion Public Methods
+
         #region Private Methods
 
         private void BakeMetaDataUpdatedEventHandler(object sender, EventArgs e)

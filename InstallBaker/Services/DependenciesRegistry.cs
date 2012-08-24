@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using AshokGelal.InstallBaker.Events;
 using AshokGelal.InstallBaker.Models;
@@ -34,6 +35,11 @@ namespace AshokGelal.InstallBaker.Services
         public Dictionary<int, FileEntry> ItsIncludedFileEntriesDict
         {
             get; private set;
+        }
+
+        public InstallerProjectManagementService ItsInstallerProjectManagementService
+        {
+            get; set;
         }
 
         public List<FileEntry> ItsNewFileEntries
@@ -79,8 +85,8 @@ namespace AshokGelal.InstallBaker.Services
             ItsExcludedFileEntries.Add(file);
             ItsNewFileEntries.Remove(file);
             // TODO: update xml
-
             RaiseRegistryUpdateEvent();
+            ItsInstallerProjectManagementService.RemoveFile(file.FullPath);
         }
 
         public void IncludeFile(FileEntry file)
@@ -91,6 +97,7 @@ namespace AshokGelal.InstallBaker.Services
             ItsNewFileEntries.Remove(file);
             // TODO: update xml
             RaiseRegistryUpdateEvent();
+            ItsInstallerProjectManagementService.AddNewFile(file.FullPath);
         }
 
         #endregion Public Methods
@@ -165,7 +172,7 @@ namespace AshokGelal.InstallBaker.Services
             _tempFiles = new List<FileEntry>();
             ItsIncludedFileEntriesDict = new Dictionary<int, FileEntry>();
             ItsExcludedFileEntries = new List<FileEntry>();
-            _excludedExtensions = new List<string> { "*.pdb", "*.manifest", "*.vshost.exe.*","*.vshost.exe"};
+            _excludedExtensions = new List<string> { "*.pdb", "*.manifest", "*.vshost.exe.*","*.vshost.exe", "*.xml"};
         }
 
         private void RaiseRegistryUpdateEvent()

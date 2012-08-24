@@ -307,12 +307,8 @@ namespace AshokGelal.InstallBaker.Services
         {
             foreach (var bakeFile in component.ItsBakeFiles)
             {
-                var source = bakeFile.ItsSource;
-                var filename = Path.GetFileName(source);
-                if(filename== null)
-                    continue;
-                var fileElement = new XElement(xn + "File", new XAttribute("Id", filename),
-                                                new XAttribute("Source", source));
+                var fileElement = new XElement(xn + "File", new XAttribute("Id", bakeFile.ItsId),
+                                                new XAttribute("Source", bakeFile.ItsSource));
                 parent.Add(fileElement);
             }
         }
