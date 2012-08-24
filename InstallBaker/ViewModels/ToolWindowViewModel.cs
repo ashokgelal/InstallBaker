@@ -15,17 +15,29 @@ namespace AshokGelal.InstallBaker.ViewModels
     {
         #region Fields
 
+        private ViewModelCommand<FileEntry> _addFileCommand;
         private BakeMetadata _bakeMetaData;
         private readonly DependenciesRegistry _dependenciesRegistry;
         private readonly InstallBakerEventAggregator _eventAggregator;
         private ObservableCollection<FileEntry> _excludedFileList;
         private ObservableCollection<FileEntry> _includedFileList;
         private ObservableCollection<FileEntry> _newFileList;
+        private ViewModelCommand<FileEntry> _removeFileCommand;
         private ViewModelCommand _updateMetadataCommand;
 
         #endregion Fields
 
         #region Properties
+
+        public ViewModelCommand<FileEntry> ItsAddFileCommand
+        {
+            get { return _addFileCommand; }
+            set
+            {
+                _addFileCommand = value;
+                NotifyPropertyChanged(()=>ItsAddFileCommand);
+            }
+        }
 
         public BakeMetadata ItsBakeMetaData
         {
@@ -67,6 +79,16 @@ namespace AshokGelal.InstallBaker.ViewModels
             }
         }
 
+        public ViewModelCommand<FileEntry> ItsRemoveFileCommand
+        {
+            get { return _removeFileCommand; }
+            set
+            {
+                _removeFileCommand = value;
+                NotifyPropertyChanged(()=>ItsRemoveFileCommand);
+            }
+        }
+
         public ViewModelCommand ItsUpdateMetadataCommand
         {
             get { return _updateMetadataCommand; }
@@ -85,7 +107,7 @@ namespace AshokGelal.InstallBaker.ViewModels
         {
             _eventAggregator = eventAggregator;
             _dependenciesRegistry = dependenciesRegistry;
-            ItsUpdateMetadataCommand = new ViewModelCommand(UpdateMetadataCommandHandler, CanUpdateMetadata);
+            Initialize();
             HookEvents();
         }
 
@@ -101,6 +123,16 @@ namespace AshokGelal.InstallBaker.ViewModels
         #endregion Dispose
 
         #region Private Methods
+
+        private void AddFileCommandHandler(FileEntry file)
+        {
+            _dependenciesRegistry.IncludeFile(file);
+        }
+
+        private void AddRemoveCommandHandler(FileEntry file)
+        {
+            _dependenciesRegistry.ExcludeFile(file);
+        }
 
         private void BakeMetadataAvailableEventHandler(object sender, DietMvvm.Events.SingleEventArgs<BakeMetadata> e)
         {
@@ -128,6 +160,13 @@ namespace AshokGelal.InstallBaker.ViewModels
             _eventAggregator.BuildFinished.ItsEvent += BuildFinishedEventHandler;
             _eventAggregator.BakeMetadataAvailable.ItsEvent += BakeMetadataAvailableEventHandler;
             _dependenciesRegistry.DependenciesRegistryUpdateEvent.ItsEvent += DependenciesRegistry_DependenciesRegistryUpdateEventHandler;
+        }
+
+        private void Initialize()
+        {
+            ItsUpdateMetadataCommand = new ViewModelCommand(UpdateMetadataCommandHandler, CanUpdateMetadata);
+            ItsAddFileCommand = new ViewModelCommand<FileEntry>(AddFileCommandHandler);
+            ItsRemoveFileCommand = new ViewModelCommand<FileEntry>(AddRemoveCommandHandler);
         }
 
         private void UnHookEvents()

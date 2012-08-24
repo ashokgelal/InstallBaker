@@ -16,6 +16,7 @@ namespace AshokGelal.InstallBaker.Services
     {
         #region Fields
 
+        private BakeMetadata _bakeMetadata;
         private readonly InstallBakerEventAggregator _eventAggregator;
         private List<string> _excludedExtensions;
         private FileSystemService _fileSystemSerivce;
@@ -69,7 +70,36 @@ namespace AshokGelal.InstallBaker.Services
 
         #endregion Dispose
 
+        #region Public Methods
+
+        public void ExcludeFile(FileEntry file)
+        {
+            // TODO: check for directory
+            ItsIncludedFileEntriesDict.Remove(file.GetHashCode());
+            ItsExcludedFileEntries.Add(file);
+            // TODO: update xml
+
+            RaiseRegistryUpdateEvent();
+        }
+
+        public void IncludeFile(FileEntry file)
+        {
+            // TODO: check for directory
+            ItsExcludedFileEntries.Remove(file);
+            ItsIncludedFileEntriesDict.Add(file.GetHashCode(), file);
+            ItsNewFileEntries.Remove(file);
+            // TODO: update xml
+            RaiseRegistryUpdateEvent();
+        }
+
+        #endregion Public Methods
+
         #region Private Methods
+
+        private void BakeMetadataAvailableEventHandler(object sender, SingleEventArgs<BakeMetadata> e)
+        {
+            _bakeMetadata = e.ItsValue;
+        }
 
         private void BuildStartedEventHandler(object sender, SingleEventArgs<List<ProjectInfo>> e)
         {
@@ -78,6 +108,9 @@ namespace AshokGelal.InstallBaker.Services
 
         private void FileSystemService_FileEntryAvailableEventHandler(object sender, SingleEventArgs<FileEntry> e)
         {
+            // TODO: allow adding a directory
+            if (e.ItsValue.FileEntryType == FileEntryType.Directory)
+                return;
             var hash = e.ItsValue.GetHashCode();
             if(!ItsIncludedFileEntriesDict.ContainsKey(hash))
                 _tempFiles.Add(e.ItsValue);
@@ -105,8 +138,10 @@ namespace AshokGelal.InstallBaker.Services
             foreach (var entry in lists.ItsNonMatchedFileEntries)
             {
                 if(!ItsNewFileEntries.Contains(entry))
-                  ItsNewFileEntries.Add(entry);
-            //                ItsIncludedFileEntriesDict.Add(entry.GetHashCode(), entry);
+                {
+                    if(!entry.DisplayTitle.Equals(_bakeMetadata.ItsMainExecutableDisplayName, StringComparison.CurrentCultureIgnoreCase))
+                      ItsNewFileEntries.Add(entry);
+                }
             }
 
             ItsExcludedFileEntries = lists.ItsMatchedFileEntries;
@@ -116,6 +151,7 @@ namespace AshokGelal.InstallBaker.Services
         {
             _eventAggregator.BuildStarted.ItsEvent +=BuildStartedEventHandler;
             _eventAggregator.StartupProjectBuildFinished.ItsEvent += StartupProjectBuildFinishedEventHandler;
+            _eventAggregator.BakeMetadataAvailable.ItsEvent +=BakeMetadataAvailableEventHandler;
             _fileSystemSerivce.ItsFileEntryAvailableEvent.ItsEvent +=FileSystemService_FileEntryAvailableEventHandler;
             _fileSystemSerivce.ItsScanStatusChangedEvent.ItsEvent += FileSystemService_ScanStatusChangedEventHandler;
         }
@@ -145,6 +181,7 @@ namespace AshokGelal.InstallBaker.Services
         {
             _eventAggregator.BuildStarted.ItsEvent -=BuildStartedEventHandler;
             _eventAggregator.StartupProjectBuildStarted.ItsEvent -= StartupProjectBuildFinishedEventHandler;
+            _eventAggregator.BakeMetadataAvailable.ItsEvent -=BakeMetadataAvailableEventHandler;
             _fileSystemSerivce.ItsFileEntryAvailableEvent.ItsEvent -=FileSystemService_FileEntryAvailableEventHandler;
             _fileSystemSerivce.ItsScanStatusChangedEvent.ItsEvent -= FileSystemService_ScanStatusChangedEventHandler;
         }

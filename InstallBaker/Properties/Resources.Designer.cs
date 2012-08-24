@@ -70,7 +70,7 @@ namespace AshokGelal.InstallBaker.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to InstallBaker Tool Window.
+        ///   Looks up a localized string similar to Bakery Window.
         /// </summary>
         internal static string ToolWindowTitle {
             get {

@@ -8,24 +8,119 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="400"
              d:DataContext="{d:DesignInstance ViewModels:ToolWindowViewModel}"
-             Name="MyToolWindow">
+             Name="Container">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="_fileItemStyle" DataType="Models:FileEntry">
-            <Border BorderBrush="#990099FF" BorderThickness="0.8">
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="5 5 0 5" />
+            <Setter Property="Foreground" Value="#FF0099FF" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#FF0099FF" />
+            <Setter Property="Margin" Value="5 5 0 5" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="5 1 1 1" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="5" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5 1 1 1" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="15 5" />
+        </Style>
+
+        <DataTemplate x:Key="_addItemStyle" DataType="Models:FileEntry">
+            <Border x:Name="AddBorder" BorderBrush="#FFFFFFFF" BorderThickness="0.8 0 0.8 0.8">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding DisplayTitle}" />
-                    <Button Grid.Column="1" Content=" + " />
-                    <Button Grid.Column="2" Content=" - " />
-                    <Button Grid.Column="3" Content=" x " />
+                    <Border Grid.Column="0" BorderBrush="{x:Null}" Height="25">
+                      <TextBlock Text="{Binding DisplayTitle}" />
+                    </Border>
+                    <Button Grid.Column="1" Content="Add" Command="{Binding DataContext.ItsAddFileCommand, ElementName=Container}" CommandParameter="{Binding}" />
                 </Grid>
             </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=PreviousData}}" Value="{x:Null}">
+                    <Setter TargetName="AddBorder" Property="BorderThickness" Value="1,1,1,1"/>
+                </DataTrigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#22777777" TargetName="AddBorder"/>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#22BBBBBB" TargetName="AddBorder"/>
+                </Trigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="_removeItemStyle" DataType="Models:FileEntry">
+            <Border x:Name="RemoveBorder" BorderBrush="#FFFFFFFF" BorderThickness="0.8 0 0.8 0.8">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" BorderBrush="{x:Null}" Height="25">
+                      <TextBlock Text="{Binding DisplayTitle}" />
+                    </Border>
+                    <Button Grid.Column="1" Content="Remove" Command="{Binding DataContext.ItsRemoveFileCommand, ElementName=Container}" CommandParameter="{Binding}" />
+                </Grid>
+            </Border>
+
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=PreviousData}}" Value="{x:Null}">
+                    <Setter TargetName="RemoveBorder" Property="BorderThickness" Value="1,1,1,1"/>
+                </DataTrigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#22777777" TargetName="RemoveBorder"/>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#22BBBBBB" TargetName="RemoveBorder"/>
+                </Trigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <DataTemplate x:Key="_addRemoveItemStyle" DataType="Models:FileEntry">
+            <Border x:Name="AddBorder" BorderBrush="#FFFFFFFF" BorderThickness="0.8 0 0.8 0.8">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="{x:Null}" Height="25">
+                      <TextBlock Text="{Binding DisplayTitle}" />
+                    </Border>
+                    <Button Grid.Column="1" Margin="0 0 2 0" Content="Add" Command="{Binding DataContext.ItsAddFileCommand, ElementName=Container}" CommandParameter="{Binding}" />
+                    <Button Grid.Column="2" Content="Remove" Command="{Binding DataContext.ItsRemoveFileCommand, ElementName=Container}" CommandParameter="{Binding}" />
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=PreviousData}}" Value="{x:Null}">
+                    <Setter TargetName="AddBorder" Property="BorderThickness" Value="1,1,1,1"/>
+                </DataTrigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                    <Setter Property="Background" Value="#22777777" TargetName="AddBorder"/>
+                </Trigger>
+                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#22BBBBBB" TargetName="AddBorder"/>
+                </Trigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
     <Grid Margin="10 0">
@@ -36,55 +131,32 @@
         <ToolBar Visibility="Collapsed">
             <Button Content="Foo" />
         </ToolBar>
-        <TabControl Grid.Row="1" VerticalAlignment="Stretch">
-            <TabItem Header="New">
+        <TabControl Grid.Row="1" VerticalAlignment="Stretch" Background="#99FFFFFF">
+            <TabItem Header="New Items">
                 <Grid>
                     <ItemsControl
-                        ItemTemplate="{StaticResource _fileItemStyle}"
+                        ItemTemplate="{StaticResource _addRemoveItemStyle}"
                         ItemsSource="{Binding ItsNewFileList}">
                     </ItemsControl>
                 </Grid>
             </TabItem>
-            <TabItem Header="Includes">
+            <TabItem Header="Included Items">
                 <Grid>
                     <ItemsControl
-                        ItemTemplate="{StaticResource _fileItemStyle}"
+                        ItemTemplate="{StaticResource _removeItemStyle}"
                         ItemsSource="{Binding ItsIncludedFileList}">
                     </ItemsControl>
                 </Grid>
             </TabItem>
-            <TabItem Header="Excludes">
+            <TabItem Header="Excluded Items">
                 <Grid>
                     <ItemsControl
-                        ItemTemplate="{StaticResource _fileItemStyle}"
+                        ItemTemplate="{StaticResource _addItemStyle}"
                         ItemsSource="{Binding ItsExcludedFileList}">
                     </ItemsControl>
                 </Grid>
             </TabItem>
-            <TabItem Header="Bake Info">
-                <TabItem.Resources>
-                    <Style TargetType="Label">
-                        <Setter Property="Margin" Value="5 5 0 5" />
-                        <Setter Property="FontWeight" Value="Bold" />
-                        <Setter Property="FontSize" Value="13" />
-                    </Style>
-
-                    <Style TargetType="CheckBox">
-                        <Setter Property="Margin" Value="5 5 0 5" />
-                        <Setter Property="FontWeight" Value="Bold" />
-                        <Setter Property="FontSize" Value="13" />
-                    </Style>
-                    <Style TargetType="TextBox">
-                        <Setter Property="Margin" Value="5 1 1 1" />
-                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                        <Setter Property="FontSize" Value="13" />
-                        <Setter Property="Padding" Value="5" />
-                    </Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Padding" Value="15 5" />
-                    </Style>
-                </TabItem.Resources>
-
+            <TabItem Header="Installer Info">
                 <StackPanel>
 
                     <Grid DataContext="{Binding ItsBakeMetaData}">
