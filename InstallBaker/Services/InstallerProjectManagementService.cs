@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using AshokGelal.InstallBaker.Events;
@@ -111,6 +112,9 @@ namespace AshokGelal.InstallBaker.Services
                                            ItsManufacturer = "MetaGeek",
                                            ItsProductName = "inSSIDer 3",
                                            ItsUpgradeCode = Guid.NewGuid(),
+                                           ItsMainExecutableComponent = new BakeComponent("MainExecutable"),
+                                           ItsProgramMenuComponent = new BakeComponent("ProgramMenuDir"),
+                                           ItsSubDirectories = new List<BakeDirectory>()
                                        };
 
                     XmlFileParserService.WriteBakeFile(vf, metadata);
@@ -123,7 +127,7 @@ namespace AshokGelal.InstallBaker.Services
 
             _eventAggregator.BakeMetadataAvailable.Raise(this, metadata);
 
-            //            XmlFileParserService.WriteWixFile(metadata, ItsWixFile);
+            XmlFileParserService.WriteWixFile(metadata, ItsWixFile);
         }
 
         private void LoadInstallerProject()

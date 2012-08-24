@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace AshokGelal.InstallBaker.Models
 {
@@ -44,20 +43,13 @@ namespace AshokGelal.InstallBaker.Models
             private set;
         }
 
-        public BakeDirectory ItsParentDirectory
-        {
-            get;
-            private set;
-        }
-
         #endregion Properties
 
         #region Constructors
 
-        public BakeComponent(string id, BakeDirectory bakeDirectory, Guid guid = default(Guid))
+        public BakeComponent(string id, Guid guid = default(Guid))
         {
             ItsId = id;
-            ItsParentDirectory = bakeDirectory;
             if (guid == default(Guid))
                 ItsGuid = Guid.NewGuid();
 
@@ -148,6 +140,8 @@ namespace AshokGelal.InstallBaker.Models
     {
         #region Fields
 
+        private bool _addBannerFlag;
+        private bool _addLicenseFlag;
         private string _companyName;
         private string _iconName;
         private string _mainExecutableDisplayName;
@@ -158,6 +152,26 @@ namespace AshokGelal.InstallBaker.Models
         #endregion Fields
 
         #region Properties
+
+        public bool ItsAddBannerFlag
+        {
+            get { return _addBannerFlag; }
+            set
+            {
+                _addBannerFlag = value;
+                NotifyPropertyChanged(()=>ItsAddBannerFlag);
+            }
+        }
+
+        public bool ItsAddLicenseFlag
+        {
+            get { return _addLicenseFlag; }
+            set
+            {
+                _addLicenseFlag = value;
+                NotifyPropertyChanged(()=>ItsAddLicenseFlag);
+            }
+        }
 
         public string ItsCompanyName
         {

@@ -64,11 +64,12 @@ namespace AshokGelal.InstallBaker.Views
             _basePackage = (InstallBakerPackage)Package;
             _eventAggreagator = new InstallBakerEventAggregator();
             _dependenciesRegistry = new DependenciesRegistry(_eventAggreagator);
-            _buildProgressService = new BuildProgressService(_eventAggreagator, _basePackage.IDE.Events.BuildEvents, _basePackage.IDE.Solution);
-            _installerProjectManagementService = new InstallerProjectManagementService(_eventAggreagator,
-                                                                       _basePackage.IDE.Events.SolutionEvents, _basePackage.IDE.Solution);
             _toolWindowViewModel = new ToolWindowViewModel(_eventAggreagator, _dependenciesRegistry);
             ((ToolWindowView) Content).DataContext = _toolWindowViewModel;
+
+            _installerProjectManagementService = new InstallerProjectManagementService(_eventAggreagator,
+                                                                       _basePackage.IDE.Events.SolutionEvents, _basePackage.IDE.Solution);
+            _buildProgressService = new BuildProgressService(_eventAggreagator, _basePackage.IDE.Events.BuildEvents, _basePackage.IDE.Solution);
         }
 
         protected override void OnClose()

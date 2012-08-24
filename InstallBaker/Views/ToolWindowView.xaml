@@ -64,7 +64,14 @@
             <TabItem Header="Bake Info">
                 <Grid DataContext="{Binding ItsBakeMetaData}">
                     <Grid.Resources>
+
                         <Style TargetType="Label">
+                            <Setter Property="Margin" Value="5 5 0 5" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="FontSize" Value="13" />
+                        </Style>
+
+                        <Style TargetType="CheckBox">
                             <Setter Property="Margin" Value="5 5 0 5" />
                             <Setter Property="FontWeight" Value="Bold" />
                             <Setter Property="FontSize" Value="13" />
@@ -84,6 +91,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -147,7 +155,7 @@
                       Content="Executable Source:" />
 
                     <DockPanel Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" LastChildFill="True">
-                        <Button Margin="0 1 1 1"
+                        <Button Margin="0 1 1 1" Visibility="Collapsed"
                             Content="Browse ..." DockPanel.Dock="Right" />
 
                         <TextBox x:Name="executableSource" 
@@ -165,7 +173,10 @@
                       Grid.Row="5"
                       Text="{Binding ItsMainExecutableDisplayName}" />
 
-                    <Button Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" 
+                    <CheckBox Grid.Column="0" Grid.Row="6" Content="Add License" />
+                    <CheckBox Grid.Column="1" Grid.Row="6" Content="Add Bitmap" />
+
+                    <Button Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" 
                             Margin="10"
                             HorizontalAlignment="Center" Content="Update" />
                 </Grid>
