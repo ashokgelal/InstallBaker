@@ -112,6 +112,15 @@ namespace AshokGelal.InstallBaker.Services
 
                 metadata.ItsSubDirectories = list;
 
+                var main_component_files = root.Element("main_component_files").Elements("File");
+
+                var fileList = new List<BakeFile>();
+                foreach (var file in main_component_files)
+                {
+                    fileList.Add(new BakeFile(file.Attribute("Id").Value, file.Attribute("Source").Value, metadata.ItsMainExecutableComponent));
+                }
+
+                metadata.ItsMainExecutableComponent.ItsBakeFiles = fileList;
                 // ReSharper restore PossibleNullReferenceException
                 return metadata;
             }
@@ -125,7 +134,6 @@ namespace AshokGelal.InstallBaker.Services
         {
             // ReSharper disable PossibleNullReferenceException
             var root = XElement.Load(path);
-            //            var root = xdoc.Element("metadata");
             root.SetElementValue("company_name", data.ItsCompanyName);
             root.SetElementValue("icon_name", data.ItsIconName);
             root.SetElementValue("executable_display_name", data.ItsMainExecutableDisplayName);
@@ -134,6 +142,9 @@ namespace AshokGelal.InstallBaker.Services
             root.SetElementValue("add_license", data.ItsAddLicenseFlag);
             root.SetElementValue("add_banner", data.ItsAddBannerFlag);
             root.SetElementValue("product_name", data.ItsProductName);
+            var executable_component = root.Element("main_component_files");
+            executable_component.Remove();
+            AddWixMainComponentFiles(data, root);
             root.Save(path);
             // ReSharper restore PossibleNullReferenceException
         }
@@ -153,6 +164,8 @@ namespace AshokGelal.InstallBaker.Services
             metadata.Add(new XElement("upgrade_code", data.ItsUpgradeCode.ToString()));
             metadata.Add(new XElement("executable_component", new XAttribute("Id", data.ItsMainExecutableComponent.ItsId), new XAttribute("Guid", data.ItsMainExecutableComponent.ItsGuid.ToString())));
             metadata.Add(new XElement("program_menu_dir", new XAttribute("Id", data.ItsProgramMenuComponent.ItsId), new XAttribute("Guid", data.ItsProgramMenuComponent.ItsGuid.ToString())));
+
+            AddWixMainComponentFiles(data, metadata);
             xdoc.Add(metadata);
             xdoc.Save(vf);
         }
@@ -303,11 +316,11 @@ namespace AshokGelal.InstallBaker.Services
             parent.Add(component);
         }
 
-        private static void AddFileElements(BakeComponent component, XElement parent)
+        private static void AddFileElements(BakeComponent component, XElement parent, XNamespace xns)
         {
             foreach (var bakeFile in component.ItsBakeFiles)
             {
-                var fileElement = new XElement(xn + "File", new XAttribute("Id", bakeFile.ItsId),
+                var fileElement = new XElement(xns + "File", new XAttribute("Id", bakeFile.ItsId),
                                                 new XAttribute("Source", bakeFile.ItsSource));
                 parent.Add(fileElement);
             }
@@ -337,7 +350,7 @@ namespace AshokGelal.InstallBaker.Services
                 #endregion
 
             mainExecutableComponent.Add(shortcutFile);
-            AddFileElements(metadata.ItsMainExecutableComponent, mainExecutableComponent);
+            AddFileElements(metadata.ItsMainExecutableComponent, mainExecutableComponent, xn);
             parent.Add(mainExecutableComponent);
         }
 
@@ -348,10 +361,17 @@ namespace AshokGelal.InstallBaker.Services
                 var directory = new XElement(xn + "Directory", new XAttribute("Id", string.Format("{0}Dir", bakeDirectory.ItsName)), new XAttribute("Name", bakeDirectory.ItsName));
                 var component = new XElement(xn + "Component", new XAttribute("Id", bakeDirectory.ItsComponent.ItsId),
                                          new XAttribute("Guid", bakeDirectory.ItsComponent.ItsGuid));
-                AddFileElements(bakeDirectory.ItsComponent, component);
+                AddFileElements(bakeDirectory.ItsComponent, component, xn);
                 directory.Add(component);
                 parent.Add(directory);
             }
+        }
+
+        private static void AddWixMainComponentFiles(BakeMetadata metadata, XElement parent)
+        {
+            var mainExecutableComponent = new XElement("main_component_files");
+            AddFileElements(metadata.ItsMainExecutableComponent, mainExecutableComponent, "");
+            parent.Add(mainExecutableComponent);
         }
 
         #endregion Private Methods
