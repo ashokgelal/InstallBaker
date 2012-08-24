@@ -77,6 +77,7 @@ namespace AshokGelal.InstallBaker.Services
             // TODO: check for directory
             ItsIncludedFileEntriesDict.Remove(file.GetHashCode());
             ItsExcludedFileEntries.Add(file);
+            ItsNewFileEntries.Remove(file);
             // TODO: update xml
 
             RaiseRegistryUpdateEvent();
